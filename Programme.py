@@ -83,13 +83,13 @@ def cells():
     for i in range( qx-1 ):
         for j in range( qy -1 ):
             for k in range( qz -1 ):
-                np.append(grid, [[ i*edge, (i+1)*edge ], [ j*edge, (j+1)* edge ], [ k*edge, (k+1)*edge ], list() ])
+                grid = np.append(grid, [[ i*edge, (i+1)*edge ], [ j*edge, (j+1)* edge ], [ k*edge, (k+1)*edge ], list() ])
 
-            np.append(grid, [[ i*edge, (i+1)*edge ], [ j*edge, (j+1)* edge ], [ qz*edge, qz*edge + rz ], list() ])
+            grid = np.append(grid, [[ i*edge, (i+1)*edge ], [ j*edge, (j+1)* edge ], [ qz*edge, qz*edge + rz ], list() ])
 
-        np.append(grid, [[ i*edge, (i+1)*edge ], [ qy*edge, qy*edge + ry ], [ qz*edge, qz*edge + rz ], list() ])
+        grid = np.append(grid, [[ i*edge, (i+1)*edge ], [ qy*edge, qy*edge + ry ], [ qz*edge, qz*edge + rz ], list() ])
 
-    np.append(grid, [[ qx*edge, qx*edge + rx ], [ qy*edge, qy*edge + ry ], [ qz*edge, qz*edge + rz ], list() ])
+    grid = np.append(grid, [[ qx*edge, qx*edge + rx ], [ qy*edge, qy*edge + ry ], [ qz*edge, qz*edge + rz ], list() ])
     return grid
 
 cell = cells()
