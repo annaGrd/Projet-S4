@@ -1,3 +1,4 @@
+import tarfile
 from time import time
 
 from Programme import mkeXsi
@@ -92,7 +93,7 @@ class Tree:
         x0.voisins[1].append(c1)
 
     def expansion_and_rewiring(self):
-        
+
         xrand = self.rand_node()
 
         xclosest = closest_node(xrand)
@@ -115,11 +116,11 @@ class Tree:
 
     def add_node(self, xnew, xclosest, Xnear, cell):  # tu comptes mettre les algos 3,4 et 5 dans ces trois fonctions ?
         xmin = xclosest
-        cmin = cost(T, xclosest) + norme(xclosest, xnew)
+        cmin = xclosest.cost(self.traj[0], self.xgoal) + norme(xclosest, xnew)
 
         for xnear in Xnear:
 
-            cnew = cost(T, xnear) + norme(xnear, xnew)
+            cnew = xnear.cost(self.traj[0], self.xgoal) + norme(xnear, xnew)
 
             if cnew < cmin and line(xnear, xnew):
                 cmin = cnew
@@ -136,17 +137,17 @@ class Tree:
 
     def rewire_random_node(self):
         t = time()
-        while t - time() < 100 and len(self.Qr) > 0: # Temps arbitraire
+        while t - time() < 100 and len(self.Qr) > 0:  # Temps arbitraire
 
             xr = self.Qr.pop(0)
             Xnear = self.find_nodes_near(xr)
 
             for xnear in Xnear:
-                cold = cost(T, xnear)
-                cnew = cost(T, xr) + norme(xr, xnear)
+                cold = xnear.cost(self.traj[0], self.xgoal)
+                cnew = xr.cost(self.traj[0], self.xgoal) + norme(xr, xnear)
 
                 if cnew < cold and line(xr, xnear):
-                    pa = parent(T, xnear)
+                    pa = xnear.parent(self.traj[0], self.xgoal)
 
                     self.add_link(xr, xnear, cnew)
                     self.remove_link(xnear, pa)
@@ -168,11 +169,11 @@ class Tree:
 
             for xnear in Xnear:
 
-                cold = cost(T, xnear)
-                cnew = cost(T, xs) + norme(xs, xnear)
+                cold = xnear.cost(self.traj[0], self.xgoal)
+                cnew = xnear.cost(self.traj[0], self.xgoal) + norme(xs, xnear)
 
                 if cnew < cold and line(xs, xnear):
-                    pa = parent(T, xnear)
+                    pa = xnear.parent(self.traj[0], self.xgoal)
 
                     self.add_link(xs, xnear, cnew)
                     self.remove_link(xnear, pa)
