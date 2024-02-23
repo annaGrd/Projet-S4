@@ -1,9 +1,9 @@
 from ref_change import reference_change
 from random import uniform
 import numpy as np
-from utils_grid import inGrid
+from utils_grid import inGrid, norme
 from noeud import Noeud
-from constants import X
+from constants import X, alpha, beta
 
 def ellipsoid( x, y, z, a, b ):
 
@@ -49,3 +49,33 @@ def uniform_sampling():
     if not inGrid(newNode): return uniform_sampling()
 
     return newNode
+
+
+def randNode( T ):
+
+    xgoal = T.xgoal
+    xo = T.traj[0]
+    Pr = uniform(0, 1)
+    xclose = T.traj[-1]  # récupère le noeud le plus proche de xgoal pour le moment
+
+    if Pr > 1 - alpha :
+
+        root = np.array([xo.x, xo.y, xo.z])
+        goal = np.array([xgoal.x, xgoal.y, xgoal.z])
+
+        return line_sample(root, goal)
+
+    elif Pr <= ( 1 - alpha ) / beta or xclose != xgoal :
+
+        return uniform_sampling()
+
+    else :
+        cmin = norme( xo, xgoal)
+        cbest = xgoal.ci # est-ce bien la distance entre xo et xgoal, pas sur
+        a = cbest / 2
+        b = ( cbest**2 + cmin**2 )**0.5 / 2
+
+        root = np.array( [ xo.x, xo.y, xo.z ] )
+        goal = np.array([xgoal.x, xgoal.y, xgoal.z])
+
+        return ellipse(root, goal, a, b)
