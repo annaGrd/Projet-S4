@@ -7,6 +7,7 @@ from utils_grid import norme, cells
 
 cell = cells()
 
+
 def mkeXsi(x):
 
     Xsi = list()
@@ -28,7 +29,7 @@ def main(xa, Xobs, xgoal):
     while norme(T.xa, T.xgoal) > rprox:  # ? le drone proche de xgoal, à modifier en dynamique
         # On récupère le xa du drone et l'évolution de l'environnement
         while time() - t < 100:  # Durée arbitraire
-            T = expAndRew(T)
+            T.expansion_and_rewiring()
 
         T = plan(T)
         if norme(T.xa, T.traj[0]) <= rprox:  # Ou faire avec le ci de traj[0]
@@ -36,7 +37,7 @@ def main(xa, Xobs, xgoal):
             T.traj.pop(0)
             T.Qs = list()
         # envoyer la traj au drone, il va vers xo
-    return  #?
+    return  # ?
 
 
 def cost(T, x):
@@ -63,7 +64,8 @@ def cost(T, x):
         x.ci = ci
         return ci
 
-## Algo 3
+# Algo 3
+
 
 def addNode(T, xnew, xclosest, Xnear):
 
@@ -106,7 +108,6 @@ def fc(T, xc):
         return cost(T, xc) + norme(xc, T.xgoal)
 
 
-
 def parent(T, x):
 
     # si on demande le parent de la racine
@@ -141,7 +142,7 @@ def rewireRandNode(T):
     while t - time() < 100 or len(T.Qr) > 0:  # Temps arbitraire
 
         xr = T.Qr.pop(0)
-        Xnear = findNodesNear(T, xr)
+        Xnear = T.find_nodes_near(xr)
 
         for xnear in Xnear:
             cold = cost(T, xnear)
@@ -175,7 +176,7 @@ def rewireRoot(T):
     while t - time() < 100 or len(T.Qs) > 0:
 
         xs = T.Qs.pop(0)
-        Xnear = findNodesNear(T, xs)
+        Xnear = T.find_nodes_near(xs)
 
         for xnear in Xnear:
 
