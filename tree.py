@@ -3,7 +3,20 @@ from random import uniform
 import numpy as np
 from random_sampling import ellipse_sampling, uniform_sampling, line_sampling
 from utils_grid import norme
-from constants import alpha, beta
+from constants import alpha, beta, kmax, rs
+
+
+def closest_node(Xsi, xrand):
+    minimumArg = Xsi[0]
+    minimumValue = norme(minimumArg, xrand)
+
+    for xi in Xsi:
+        value = norme(xi, xrand)
+        if minimumValue > value:
+            minimumArg = xi
+            minimumValue = value
+
+    return minimumArg
 
 class Tree:
     def __init__(self, noeuds=None, xa = Noeud(), xgoal = Noeud()):
@@ -45,3 +58,31 @@ class Tree:
             goal = np.array([xgoal.x, xgoal.y, xgoal.z])
 
             return ellipse_sampling(root, goal, a, b)
+        
+    def expansion_and_rewriting(self):
+        
+        xrand = self.rand_node()
+
+        Xsi = []
+        xclosest = closest_node(Xsi, xrand)
+
+        if line(xclosest, xrand):
+            Xnear = self.findNodesNear(T, xrand, Xsi)
+
+            if len(Xnear) < kmax or norme(xclosest, xrand) > rs:
+                self.add_node(xrand, xclosest, Xnear)
+                self.Qr.insert(xrand,0)  # Qr étant une pile, on pourra plutot utiliser la fin de la liste, jsp si ça sera mieux
+            else:
+                self.Qr.insert(xclosest, 0)
+
+            self.rewire_random_node()
+        self.rewire_from_root()
+
+    def add_node(self, xrand, xclosest, Xnear):
+        pass
+
+    def rewire_random_node(self):
+        pass
+
+    def rewire_from_root(self):
+        pass
