@@ -3,7 +3,8 @@ from random import uniform
 import numpy as np
 from random_sampling import ellipse_sampling, uniform_sampling, line_sampling
 from utils_grid import norme
-from constants import alpha, beta, kmax, rs
+from constants import alpha, beta, kmax, rs, vFree
+from math import pi
 
 
 def closest_node(Xsi, xrand):
@@ -67,7 +68,7 @@ class Tree:
         xclosest = closest_node(Xsi, xrand)
 
         if line(xclosest, xrand):
-            Xnear = self.findNodesNear(T, xrand, Xsi)
+            Xnear = self.find_nodes_near(xrand, Xsi)
 
             if len(Xnear) < kmax or norme(xclosest, xrand) > rs:
                 self.add_node(xrand, xclosest, Xnear)
@@ -86,3 +87,12 @@ class Tree:
 
     def rewire_from_root(self):
         pass
+
+    def find_nodes_near(self, x, Xsi):
+        Xnear = list()
+        epsilon = ((vFree * kmax) / pi * len(self.Vt)) ** .5
+
+        if epsilon < rs: epsilon = rs
+
+        for xnear in Xsi:
+            if norme(x, xnear) < epsilon: Xnear.append(xnear)
