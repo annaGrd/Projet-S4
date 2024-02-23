@@ -2,95 +2,11 @@ from math import inf, atan, cos, sin, pi
 from time import time
 from random import uniform
 import numpy as np
-
-class Noeud:
-    def __init__(self, x = 0.0, y = 0.0, z = 0.0):
-        self.x = x
-        self.y = y
-        self.z = z
-        self.block = False # être exploré ou non
-        self.ci = inf
-        self.voisins = [ np.array( list() ), np.array( list() ) ] # fusionner
-
-    def __eq__( self, other ):
-        if self.x == other.x and self.y == other.y and self.z == other.z :
-            return True
-        else:
-            return False
-
-
-class Tree:
-    def __init__(self, noeuds=None, xa = Noeud(), xgoal = Noeud()):
-        if noeuds is None:
-            noeuds = list()
-        self.Et = list()
-        self.Vt = noeuds
-        self.Qs = list()
-        self.Qr = list()
-        self.traj = list()
-        self.mem = list()
-        self.xa = xa # position du drone
-        self.xgoal = xgoal # faire choisir un point d'arriver
-
-X = np.array([[0,1000],[0,1000],[0,1000]]) # faire choisir une taille de grille
-
-Xobs = np.array([]) # à compléter
-vObs = 0
-
-for obs in Xobs :
-
-    x = obs[0][1] - obs[0][0]
-    y = obs[1][1] - obs[1][0]
-    z = obs[2][1] - obs[2][0]
-    vObs += x*y*z
-
-vTot = X[0][1] * X[1][1] * X[2][1]
-vFree = vTot - vObs
-
-
-rprox = 5 # arbitraire, algo 1
-
-def norme(x1,x2):
-    x = x1.x - x2.x
-    y = x1.y - x2.y
-    z = x1.z - x2.z
-    return (x**2 + y**2 + z**2)**0.5
-
-def inGrid( n ) :
-    for obs in Xobs :
-        if (obs[0][0] >= n.x or n.x >= obs[0][1]) or (obs[1][0] >= n.y or n.y >= obs[1][1]) or (
-                obs[2][0] >= n.z or n.z >= obs[2][1]):
-            return False
-        else:
-            pass
-    return True
-
-"""            break
-    else:
-        return True
-    return False """
-
-edge = 10 # arbitraire, taille d'une case, choisir en fonction de la taille des objets dynamiques
-
-def cells():
-    grid = []
-    lx = X[0][1]  # lg selon x
-    ly = X[1][1]  # lg selon y
-    lz = X[2][1]  # lg selon z
-    qx, rx = divmod(lx, edge)
-    qy, ry = divmod(ly, edge)
-    qz, rz = divmod(lz, edge)
-    coordinatesx = [[i*edge, (i+1)*edge] for i in range(qx)]
-    coordinatesy = [[i * edge, (i + 1) * edge] for i in range(qy)]
-    coordinatesz = [[i * edge, (i + 1) * edge] for i in range(qz)]
-    if rx: coordinatesx += [[qx * edge, qx * edge + rx]]
-    if ry: coordinatesy += [[qy * edge, qy * edge + ry]]
-    if rz: coordinatesz += [[qz * edge, qz * edge + rz]]
-    for cx in coordinatesx:
-        for cy in coordinatesy:
-            for cz in coordinatesz:
-                grid.append([cx, cy, cz, list()])
-    return grid
+from tree import Tree
+from noeud import Noeud
+from constants import Xobs, X, edge, rprox, kmax, rs, alpha, beta, vFree
+from utils_grid import norme, inGrid, cells
+from random_sampling import ellipse, line_sample, uniform_sampling
 
 cell = cells()
 
@@ -106,9 +22,6 @@ def mkeXsi( x ) :
         if e != x :
             Xsi.append(e)
 
-
-
-## Algo 1
 
 def main(xa, Xobs, xgoal):
 
@@ -128,144 +41,35 @@ def main(xa, Xobs, xgoal):
         # envoyer la traj au drone, il va vers xo
     return #?
 
-## Algo 2
-kmax  = 5 # arbritraire
-rs = 0.5 # arbitraire
-
-alpha = 0.1 # arbitraire
-beta = 2 # arbitraire
-
-def anglePhi( vect ):
-
-    if vect[0] != 0 and vect[1] != 0:
-
-        return atan( vect[2] / (( vect[0]**2 + vect[1]**2 )**0.5 ))
-
-    else :
-
-        return 0
-
-def rotaPhi( phi, vect ): #phi angle de latitude
-
-    mat = np.array( [ [1, 0, 0 ], [ 0, sin(phi), -cos(phi) ], [ 0, cos(phi), sin(phi)] ] )
-
-    return vect*mat
-
-def angleTheta( vect ):
-
-    if vect[0] != 0 and vect[1] != 0:
-
-        return 2*atan( vect[1] / ( vect[0] + ( vect[0]**2 + vect[1]**2 )**0.5 ))
-
-    else:
-
-        return 0
-
-def rotaTheta( theta, vect ):
-
-    mat = np.array( [[ sin(theta), -cos(theta), 0 ], [ cos(theta), sin(theta), 0 ], [ 0, 0, 1 ]] )
-
-    return vect*mat
-
-
-def ellipsoid( x, y, z, a, b ):
-
-    return ( x**2 + y**2) / b**2 + z**2 / a**2 <= 1
-
-
-def ellipse( root, mid, a, b ):
-
-    # translation
-    root -= mid
-
-    # rotation phi
-    phi = anglePhi( root )
-
-    # rotation theta
-    theta = angleTheta( root )
-
-    # recherche coordonnées, on peut le faire dès le début non ?
-    x = uniform(-b, b )
-    y = uniform(-b, b )
-    z = uniform(-a, a )
-    "c'est la merde, comment je teste que c'est dans la grille ?. Pour le moment, je le fais plus tard mais un peu contre-productif."
-    while not ellipsoid(x, y, z, a, b):
-        x = uniform(-b, b )
-        y = uniform(-b, b )
-        z = uniform(-a, a )
-
-    new = np.array( [x, y, z] )
-
-    new = rotaTheta( theta, new )
-    new = rotaPhi( phi, new )
-    new += mid
-
-    # moyen de faire plus joli que de réécrire la même chose dans le while ?
-    while not inGrid( Noeud(new[0], new[1], new[2]) ) :
-        x = uniform(-b, b )
-        y = uniform(-b, b )
-        z = uniform(-a, a )
-
-        while not ellipsoid(x, y, z, a, b):
-            x = uniform(-b, b )
-            y = uniform(-b, b )
-            z = uniform(-a, a )
-
-        new = root + np.array( [x, y, z] )
-
-        new = rotaTheta( theta, new )
-        new = rotaPhi( phi, new )
-        new += mid
-
-    return new[0], new[1], new[2]
-
 
 def randNode( T ):
 
     xgoal = T.xgoal
-    Pr = uniform()
+    xo = T.traj[0]
+    Pr = uniform(0, 1)
     xclose = T.traj[-1]  # récupère le noeud le plus proche de xgoal pour le moment
 
     if Pr > 1 - alpha :
 
-        r = uniform()
-        x = xgoal.x - xclose.x
-        y = xgoal.y - xclose.y
-        z = xgoal.z - xclose.z
+        root = np.array([xo.x, xo.y, xo.z])
+        goal = np.array([xgoal.x, xgoal.y, xgoal.z])
 
-        while not inGrid(Noeud(r*x + xclose.x, r*y + xclose.y, r*z + xclose.z)):
-            r = uniform()
-
-        return Noeud( r*x + xclose.x, r*y + xclose.y, r*z + xclose.z)
+        return line_sample(root, goal)
 
     elif Pr <= ( 1 - alpha ) / beta or xclose != xgoal :
 
-        x = uniform( X[0][0], X[0][1] )
-        y = uniform( X[1][0], X[1][1] )
-        z = uniform( X[2][0], X[2][1] )
-
-        while not inGrid(Noeud(x,y,z)):
-
-            x = uniform( X[0][0], X[0][1] )
-            y = uniform( X[1][0], X[1][1] )
-            z = uniform( X[2][0], X[2][1] )
-
-        return Noeud(x,y,z)
+        return uniform_sampling()
 
     else :
-
-        xo = T.traj[0]
         cmin = norme( xo, xgoal)
         cbest = xgoal.ci # est-ce bien la distance entre xo et xgoal, pas sur
         a = cbest / 2
         b = ( cbest**2 + cmin**2 )**0.5 / 2
 
-        mid = np.array([(xo.x + xgoal.x)/2, (xo.y + xgoal.y)/2,(xo.z + xgoal.z)/2])
         root = np.array( [ xo.x, xo.y, xo.z ] )
+        goal = np.array([xgoal.x, xgoal.y, xgoal.z])
 
-        x, y, z = ellipse( root, mid, a, b)
-
-        return Noeud(x, y, z)
+        return ellipse(root, goal, a, b)
 
 def findNodesNear( T, x, Xsi):
 
