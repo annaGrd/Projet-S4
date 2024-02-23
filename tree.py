@@ -79,12 +79,17 @@ class Tree:
         del x1.voisins[0][indexX0]
         del x1.voisins[1][indexX0]
 
-    def add_link(self, x0, x1):
+    def add_link(self, x0, x1, c0=None, c1=None):
+        if c0 is None:
+            c0 = x0.ci
+        if c1 is None:
+            c1 = x1.ci
+
         self.Et.append((x0, x1))  # faire un dictionnaire
         x1.voisins[0].append(x0)
-        x1.voisins[1].append(x0.ci)
+        x1.voisins[1].append(c0)
         x0.voisins[0].append(x1)
-        x0.voisins[1].append(x1.ci)
+        x0.voisins[1].append(c1)
 
     def expansion_and_rewiring(self):
         
@@ -143,13 +148,11 @@ class Tree:
                 if cnew < cold and line(xr, xnear):
                     pa = parent(T, xnear)
 
-                    self.add_link(xr, xnear)
+                    self.add_link(xr, xnear, cnew)
                     self.remove_link(xnear, pa)
 
                     if xnear not in self.Qr:
                         self.Qr.append(xnear)
-                    xr.voisins[0].append(xnear)
-                    xr.voisins[1].append(cnew)
 
     def rewire_from_root(self):
 
@@ -171,11 +174,8 @@ class Tree:
                 if cnew < cold and line(xs, xnear):
                     pa = parent(T, xnear)
 
-                    self.add_link(xs, xnear)
+                    self.add_link(xs, xnear, cnew)
                     self.remove_link(xnear, pa)
-
-                    xs.voisins[0].append(xnear)
-                    xs.voisins[1].append(cnew)
 
                 if xnear not in self.mem:  # à ajuster quand on gérera les obstacles dynamiques
                     self.Qs.append(xnear)
