@@ -7,6 +7,7 @@ from noeud import Noeud
 from constants import Xobs, X, edge, rprox, kmax, rs, alpha, beta, vFree
 from utils_grid import norme, inGrid, cells
 from random_sampling import ellipse, line_sample, uniform_sampling
+from utils_tree import findNodesNear
 
 cell = cells()
 
@@ -71,19 +72,6 @@ def randNode( T ):
 
         return ellipse(root, goal, a, b)
 
-def findNodesNear( T, x, Xsi):
-
-    Xnear = list()
-    epsilon = ( ( vFree * kmax ) / (pi * len( T.Vt ) ) )**0.5
-
-    if epsilon < rs :
-        epsilon = rs
-
-    for xnear in Xsi :
-        if norme( x, xnear) < epsilon :
-            Xnear.append( xnear )
-
-    return Xnear
 
 def expAndRew( T ):
 
