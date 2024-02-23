@@ -96,3 +96,5 @@ class Tree:
 
         for xnear in Xsi:
             if norme(x, xnear) < epsilon: Xnear.append(xnear)
+
+        return Xnear

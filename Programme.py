@@ -1,13 +1,9 @@
-from math import inf, atan, cos, sin, pi
+from math import inf
 from time import time
-from random import uniform
-import numpy as np
 from tree import Tree
 from noeud import Noeud
-from constants import Xobs, X, edge, rprox, kmax, rs, alpha, beta, vFree
-from utils_grid import norme, inGrid, cells
-from random_sampling import ellipse, line_sample, uniform_sampling
-from utils_tree import findNodesNear
+from constants import edge, rprox
+from utils_grid import norme, cells
 
 cell = cells()
 
@@ -41,31 +37,6 @@ def main(xa, Xobs, xgoal):
             T.Qs = list()
         # envoyer la traj au drone, il va vers xo
     return #?
-
-
-def expAndRew( T ):
-
-    xrand = randNode( T )
-    Xsi = # à faire
-
-    dmin = min([ norme( xrand, xi) for xi in Xsi]) # surement plus optimisé à faire
-    rang = Xsi.index( dmin )
-    xclosest = Xsi[rang] # cette ligne + les deux au-dessus pour remplacer argmin
-
-    if line( xclosest, xrand ): # n'existe pas encore
-        Xnear = findNodesNear( T, xrand, Xsi )
-
-        if len( Xnear ) < kmax or norme( xclosest, xrand ) > rs :
-            addNode( T, xrand, xclosest, Xnear)
-            T.Qr.insert( xrand, 0)
-
-        else:
-            T.Qr.insert( xclosest, 0)
-
-        T = rewireRandNode( T )
-    T = rewireRoot( T )
-
-    return T
 
 ## Algo 3
 
