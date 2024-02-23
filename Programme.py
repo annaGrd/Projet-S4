@@ -64,38 +64,6 @@ def cost(T, x):
         x.ci = ci
         return ci
 
-# Algo 3
-
-
-def addNode(T, xnew, xclosest, Xnear):
-
-    xmin = xclosest
-    cmin = cost(T, xclosest) + norme(xclosest, xnew)
-
-    for xnear in Xnear:
-
-        cnew = cost(T, xnear) + norme(xnear, xnew)
-
-        if cnew < cmin and line(xnear, xnew):
-            cmin = cnew
-            xmin = xnear
-
-    T.Vt.append(xnew)
-    T.Et.append((xmin, xnew))  # faire un dictionnaire
-    xnew.voisins[0].append(xmin)
-    xnew.voisins[1].append(xmin.ci)
-    xmin.voisins[0].append(xnew)
-    xmin.voisins[1].append(xnew.ci)
-
-    # Ajout du nœud dans la case correspondante dans la grille
-    qx = xnew.x // edge
-    qy = xnew.y // edge
-    qz = xnew.z // edge
-    cell[qx][qy][qz][3].append(xnew)
-
-    return None
-
-
 # Algo 4
 
 def fc(T, xc):
@@ -132,76 +100,6 @@ def parent(T, x):
             pa = voisin[0]
 
     return pa
-
-# Mettre en commun des bouts d'algo 4 et 5.
-
-
-def rewireRandNode(T):
-
-    t = time()
-    while t - time() < 100 or len(T.Qr) > 0:  # Temps arbitraire
-
-        xr = T.Qr.pop(0)
-        Xnear = T.find_nodes_near(xr)
-
-        for xnear in Xnear:
-            cold = cost(T, xnear)
-            cnew = cost(T, xr) + norme(xr, xnear)
-
-            if cnew < cold and line(xr, xnear):
-                T.Et.append((xr, xnear))
-                pa = parent(T, xnear)
-
-                if (xnear, pa) in T.Et:
-                    T.Et.remove((xnear, pa))
-                else:  # volontairement un else pour déclencher une erreur si cette arête n'existait pas
-                    T.Et.remove((pa, xnear))
-
-                if xnear not in T.Qr:  # cette condition est censée être toujours vraie
-                    T.Qr.append(xnear)
-                xr.voisins[0].append(xnear)
-                xr.voisins[1].append(cnew)
-    return T
-
-# Algo 5
-
-
-def rewireRoot(T):
-
-    if len(T.Qs) == 0:
-        T.Qs.append(T.traj[0])
-        T.mem = list()
-
-    t = time()
-    while t - time() < 100 or len(T.Qs) > 0:
-
-        xs = T.Qs.pop(0)
-        Xnear = T.find_nodes_near(xs)
-
-        for xnear in Xnear:
-
-            cold = cost(T, xnear)
-            cnew = cost(T, xs) + norme(xs, xnear)
-
-            if cnew < cold and line(xs, xnear):
-
-                T.Et.append((xs, xnear))
-                pa = parent(T, xnear)
-
-                if (xnear, pa) in T.Et:
-                    T.Et.remove((xnear, pa))
-
-                else:
-                    T.Et.remove((pa, xnear))
-
-                xs.voisins[0].append(xnear)
-                xs.voisins[1].append(cnew)
-
-            if xnear not in T.mem:  # à ajuster quand on gérera les obstacles dynamiques
-                T.Qs.append(xnear)
-                T.mem.append(xnear)
-
-    return T
 
 # Algo 6
 

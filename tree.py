@@ -1,10 +1,12 @@
+from time import time
+
 from Programme import mkeXsi
 from noeud import Noeud
 from random import uniform
 import numpy as np
 from random_sampling import ellipse_sampling, uniform_sampling, line_sampling
 from utils_grid import norme
-from constants import alpha, beta, kmax, rs, vFree
+from constants import alpha, beta, kmax, rs, vFree, edge
 from math import pi
 
 
@@ -62,7 +64,28 @@ class Tree:
             goal = np.array([xgoal.x, xgoal.y, xgoal.z])
 
             return ellipse_sampling(root, goal, a, b)
-        
+
+    def remove_link(self, x0, x1):
+        if (x0, x1) in self.Et:
+            self.Et.remove((x0, x1))
+        else:
+            self.Et.remove((x1, x0))
+
+        indexX1 = x0.voisins[0].index(x1)
+        del x0.voisins[0][indexX1]
+        del x0.voisins[1][indexX1]
+
+        indexX0 = x1.voisins[0].index(x0)
+        del x1.voisins[0][indexX0]
+        del x1.voisins[1][indexX0]
+
+    def add_link(self, x0, x1):
+        self.Et.append((x0, x1))  # faire un dictionnaire
+        x1.voisins[0].append(x0)
+        x1.voisins[1].append(x0.ci)
+        x0.voisins[0].append(x1)
+        x0.voisins[1].append(x1.ci)
+
     def expansion_and_rewiring(self):
         
         xrand = self.rand_node()
@@ -85,14 +108,78 @@ class Tree:
             self.rewire_random_node()
         self.rewire_from_root()
 
-    def add_node(self, xrand, xclosest, Xnear):  # tu comptes mettre les algos 3,4 et 5 dans ces trois fonctions ?
-        pass
+    def add_node(self, xnew, xclosest, Xnear, cell):  # tu comptes mettre les algos 3,4 et 5 dans ces trois fonctions ?
+        xmin = xclosest
+        cmin = cost(T, xclosest) + norme(xclosest, xnew)
+
+        for xnear in Xnear:
+
+            cnew = cost(T, xnear) + norme(xnear, xnew)
+
+            if cnew < cmin and line(xnear, xnew):
+                cmin = cnew
+                xmin = xnear
+
+        self.Vt.append(xnew)
+        self.add_link(xmin)
+
+        # Ajout du nœud dans la case correspondante dans la grille
+        qx = xnew.x // edge
+        qy = xnew.y // edge
+        qz = xnew.z // edge
+        cell[qx][qy][qz][3].append(xnew)
 
     def rewire_random_node(self):
-        pass
+        t = time()
+        while t - time() < 100 and len(self.Qr) > 0: # Temps arbitraire
+
+            xr = self.Qr.pop(0)
+            Xnear = self.find_nodes_near(xr)
+
+            for xnear in Xnear:
+                cold = cost(T, xnear)
+                cnew = cost(T, xr) + norme(xr, xnear)
+
+                if cnew < cold and line(xr, xnear):
+                    pa = parent(T, xnear)
+
+                    self.add_link(xr, xnear)
+                    self.remove_link(xnear, pa)
+
+                    if xnear not in self.Qr:
+                        self.Qr.append(xnear)
+                    xr.voisins[0].append(xnear)
+                    xr.voisins[1].append(cnew)
 
     def rewire_from_root(self):
-        pass
+
+        if not self.Qs:
+            self.Qs.append(self.traj[0])
+            self.mem = list()
+
+        t = time()
+        while t - time() < 100 and self.Qs:
+
+            xs = self.Qs.pop(0)
+            Xnear = self.find_nodes_near(xs)
+
+            for xnear in Xnear:
+
+                cold = cost(T, xnear)
+                cnew = cost(T, xs) + norme(xs, xnear)
+
+                if cnew < cold and line(xs, xnear):
+                    pa = parent(T, xnear)
+
+                    self.add_link(xs, xnear)
+                    self.remove_link(xnear, pa)
+
+                    xs.voisins[0].append(xnear)
+                    xs.voisins[1].append(cnew)
+
+                if xnear not in self.mem:  # à ajuster quand on gérera les obstacles dynamiques
+                    self.Qs.append(xnear)
+                    self.mem.append(xnear)
 
     def find_nodes_near(self, x):
         Xnear = mkeXsi(x)
@@ -100,7 +187,7 @@ class Tree:
 
         if epsilon < rs: epsilon = rs
 
-        for xnear in Xsi:
+        for xnear in Xnear:
             if norme(x, xnear) < epsilon: Xnear.append(xnear)
 
         return Xnear
