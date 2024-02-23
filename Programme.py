@@ -50,7 +50,7 @@ def cost(T, x):
 
     pa = parent(T, x)
     if pa == T.traj[0]:
-        ci = norme(T.traj[0], pa)
+        ci = norme(T.traj[0], x)
         x.ci = ci
         return ci
 
