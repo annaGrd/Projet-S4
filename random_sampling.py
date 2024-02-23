@@ -5,16 +5,19 @@ from utils_grid import inGrid, norme
 from noeud import Noeud
 from constants import X, alpha, beta
 
-def ellipsoid( x, y, z, a, b ):
 
-    return ( x**2 + y**2) / b**2 + z**2 / a**2 <= 1
+def ellipsoid(x, y, z, a, b):
+
+    return (x**2 + y**2) / b**2 + z**2 / a**2 <= 1
+
 
 def ellipse_sampling(root, goal, a, b):
     # recherche coordonnées, on peut le faire dès le début non ?
     x = uniform(-b, b)
     y = uniform(-b, b)
     z = uniform(-a, a)
-    "c'est la merde, comment je teste que c'est dans la grille ?. Pour le moment, je le fais plus tard mais un peu contre-productif."
+    """c'est la merde, comment je teste que c'est dans la grille ?.
+    Pour le moment, je le fais plus tard mais un peu contre-productif."""
     while not ellipsoid(x, y, z, a, b):
         x = uniform(-b, b)
         y = uniform(-b, b)
