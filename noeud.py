@@ -12,7 +12,7 @@ class Noeud:
         self.block = False  # être exploré ou non
         self.marqueur = False  # pour fc, savoir si bloqué pour fc
         self.ci = float("inf")
-        self.voisins = [np.array(list()), np.array(list())]  # fusionner
+        self.voisins = [list(), list()]  # fusionner
 
     def __eq__(self, other):
         if self.x == other.x and self.y == other.y and self.z == other.z:
@@ -21,28 +21,27 @@ class Noeud:
             return False
 
     def parent(self, xo, xgoal):
-    
+
         # si on demande le parent de la racine
         if self == xo:
             return None
-    
+
         voisins = self.voisins[0]
         ci = self.voisins[1]
         # prendre celui avec le ci plus petit que self
-    
+
         for i in range(len(ci)):
             ci[i] = voisins[i].fc(xo, xgoal)
-    
+
         cmin = ci[0]
         pa = voisins[0]
-    
+
         for voisin in voisins:
-    
+
             if voisin[1] < cmin:
-    
                 cmin = voisin[1]
                 pa = voisin[0]
-    
+
         return pa
 
     def cost(self, xo, xgoal):
@@ -75,3 +74,17 @@ class Noeud:
 
         else:
             return self.cost(xo, xgoal) + norme(self, xgoal)
+
+    def bestChild(self, xo, xgoal):
+
+        v = self.voisins[0]
+        c = self.voisins[1]
+
+        rg = v.index(self.parent(xo, xgoal))
+        v.pop(rg)  # retire le parent
+        c.pop(rg)  # et son coût
+        xTempo = Noeud()
+        xTempo.voisins[0] = v
+        xTempo.voisins[1] = c
+
+        return xTempo.parent(xo, xgoal)  # on récupère donc le deuxième meilleur voisin
