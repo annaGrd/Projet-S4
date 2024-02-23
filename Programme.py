@@ -41,22 +41,6 @@ def main(xa, Xobs, xgoal):
 
 # Algo 6
 
-
-def bestChild(T, x):
-
-    v = x.voisins[0]
-    c = x.voisins[1]
-
-    rg = v.index(x.parent(T.traj[0], T.xgoal))
-    v.pop(rg)  # retire le parent
-    c.pop(rg)  # et son coût
-    xTempo = Noeud()
-    xTempo.voisins.append(v)
-    xTempo.ci.append(c)
-
-    return xTempo.parent(T.traj[0], T.xgoal)  # on récupère donc le deuxième meilleur voisin
-
-
 def deadEnd(T, x):
     if len(x.voisins[0]) < 2:  # si n'a qu'un voisin (juste son parent)
         return True
@@ -83,7 +67,7 @@ def plan(T):
         path = [T.traj[0]]
         while deadEnd(T, path[-1]):
 
-            path.append(bestChild(T, path[-1]))
+            path.append(path[-1].bestChild(T.traj[0],T.xgoal))
 
         path[-1].block = True
         if path[-1].fc(T.traj[0], T.xgoal) == T.traj[-1].fc(T.traj[0], T.xgoal):
