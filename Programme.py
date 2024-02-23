@@ -39,68 +39,6 @@ def main(xa, Xobs, xgoal):
         # envoyer la traj au drone, il va vers xo
     return  # ?
 
-
-def cost(T, x):
-
-    """ Pas des plus optimisés pour le moment, recalcule le ci à chaque fois.
-    En ayant connaissance des changements en amont, on n'aurait pas à tout recalculer.
-    Utiliser blocked ?
-
-    Pas certaine que ma structure récursive fonctionne (retours appréciés)
-    """
-
-    pa = parent(T, x)
-    if pa == T.traj[0]:
-        ci = norme(T.traj[0], x)
-        x.ci = ci
-        return ci
-
-    elif pa.ci == inf or pa.marqueur:  # pas sûre d'avoir besoin des deux conditions
-        x.ci = inf
-        return inf
-
-    else:
-        ci = cost(T, pa) + norme(x, pa)
-        x.ci = ci
-        return ci
-
-# Algo 4
-
-def fc(T, xc):
-
-    # à modifier si on passe à un xgoal dynamique
-    if xc.marqueur:  # pas sûre que cette condition soit utile avec l'existence de cost()
-        return inf
-
-    else:
-        return cost(T, xc) + norme(xc, T.xgoal)
-
-
-def parent(T, x):
-
-    # si on demande le parent de la racine
-    if x == T.traj[0]:
-        return None
-
-    voisins = x.voisins[0]
-    ci = x.voisins[1]
-    # prendre celui avec le ci plus petit que x
-
-    for i in range(len(ci)):
-        ci[i] = fc(T, voisins[i])
-
-    cmin = ci[0]
-    pa = voisins[0]
-
-    for voisin in voisins:
-
-        if voisin[1] < cmin:
-
-            cmin = voisin[1]
-            pa = voisin[0]
-
-    return pa
-
 # Algo 6
 
 
@@ -109,14 +47,14 @@ def bestChild(T, x):
     v = x.voisins[0]
     c = x.voisins[1]
 
-    rg = v.index(parent(T, x))
+    rg = v.index(x.parent(T.traj[0], T.xgoal))
     v.pop(rg)  # retire le parent
     c.pop(rg)  # et son coût
     xTempo = Noeud()
     xTempo.voisins.append(v)
     xTempo.ci.append(c)
 
-    return parent(T, xTempo)  # on récupère donc le deuxième meilleur voisin
+    return xTempo.parent(T.traj[0], T.xgoal)  # on récupère donc le deuxième meilleur voisin
 
 
 def deadEnd(T, x):
@@ -124,7 +62,7 @@ def deadEnd(T, x):
         return True
 
     else:
-        pa = parent(T, x)
+        pa = x.parent(T.traj[0], T.xgoal)
         enfant = x.voisins[0]  # référence partagée ?
         enfant.remove(pa)  # obtient liste des nœuds enfants
 
@@ -148,7 +86,7 @@ def plan(T):
             path.append(bestChild(T, path[-1]))
 
         path[-1].block = True
-        if fc(T, path[-1]) == fc(T, T.traj[-1]):
+        if path[-1].fc(T.traj[0], T.xgoal) == T.traj[-1].fc(T.traj[0], T.xgoal):
 
             # Comparer les arêtes, voir si elles ont changé. Regarder les ci, voir si l'un est infini
             """faire une diff de norme entre xa,xgoal et xk,goal"""
