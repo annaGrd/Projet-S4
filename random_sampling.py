@@ -1,9 +1,9 @@
 from ref_change import reference_change
 from random import uniform
 import numpy as np
-from utils_grid import inGrid, norme
+from utils_grid import inGrid
 from noeud import Noeud
-from constants import X, alpha, beta
+from constants import X
 
 
 def ellipsoid(x, y, z, a, b):
