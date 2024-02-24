@@ -5,7 +5,7 @@ from noeud import Noeud
 from random import uniform
 import numpy as np
 from random_sampling import ellipse_sampling, uniform_sampling, line_sampling
-from utils_grid import norme, cells
+from utils_grid import norme, cells, list_indices_at_range
 from constants import alpha, beta, kmax, rs, vFree, edge
 from math import pi
 
@@ -23,6 +23,9 @@ class Tree:
         self.xa = xa  # position du drone
         self.xgoal = xgoal  # faire choisir un point d'arrivée
         self.cell = cells()
+        self.nbcellx = len(self.cell)
+        self.nbcelly = len(self.cell[0])
+        self.nbcellz = len(self.cell[0][0])
 
     def rand_node(self):
         xgoal = self.xgoal
@@ -190,48 +193,30 @@ class Tree:
 
     def mkeXsi(self, x):
 
-        Xsi = list()
         qx = int(x.x // edge)
         qy = int(x.y // edge)
         qz = int(x.z // edge)
-        nodes = self.cell[qx][qy][qz]
 
-        for e in nodes:
-            if e != x:
-                Xsi.append(e)
+        Xsi = self.cell[qx][qy][qz]
+        if x in Xsi:
+            Xsi.remove(x)
 
-        empty = True
         radius = 0
-        while empty:
+        extraRadius = 0
+        while extraRadius < 2: # Nombre arbitraire, designe le nombre de couches supplementaires a prendre en compte apres avoir trouve une node
             radius += 1
-            gap = [i for i in range(-radius, radius+1)]
-            for abscissa in gap:
-                for ordinate in gap:
-                    for altitude in gap:
-                        """j'aimerais mettre une condition du type si l'indice n'est pas dans
-                        la liste, on ignore et on passe à la suite. N'étant point accoutumée 
-                        à l'usage des try and except, je t'invite à check si c'est correct"""
-                        try:
-                            cell = self.cell[qx + abscissa][qy + ordinate][qz + altitude]
-                        except IndexError:
-                            pass
-                        else:
-                            if cell:
-                                Xsi.extend(cell)
-                                empty = False
+            gap = list_indices_at_range(radius)
+            for abscissa, ordinate, altitude in gap:
+                """j'aimerais mettre une condition du type si l'indice n'est pas dans
+                la liste, on ignore et on passe à la suite. N'étant point accoutumée 
+                à l'usage des try and except, je t'invite à check si c'est correct"""
 
-        for i in range(2):  # choix arbitraire de prendre les deux rangs au-delà du rang de la première case non vide
-            radius += 1
-            gap = [i for i in range(-radius, radius + 1)]
-            for abscissa in gap:
-                for ordinate in gap:
-                    for altitude in gap:
-                        try:
-                            cell = self.cell[qx + abscissa][qy + ordinate][qz + altitude]
-                        except IndexError:
-                            pass
-                        else:
-                            Xsi.extend(cell)  
+                if not (0 <= qx + abscissa < self.nbcellx and 0 <= qy + ordinate < self.nbcelly and 0 <= qz + altitude < self.nbcellz): continue
+
+                cell = self.cell[qx + abscissa][qy + ordinate][qz + altitude]
+                Xsi.extend(cell)
+                if Xsi != []:
+                    extraRadius += 1
         return Xsi
 
     def add_node_to_cell(self, x):

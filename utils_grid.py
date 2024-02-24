@@ -25,9 +25,9 @@ def inGrid(n):
 
 
 def cells():
-    lx = X[0][1] - X[0][0]  # lg selon x
-    ly = X[1][1] - X[1][0]  # lg selon y
-    lz = X[2][1] - X[2][0]  # lg selon z
+    lx = X[0][1]  # lg selon x
+    ly = X[1][1]  # lg selon y
+    lz = X[2][1]  # lg selon z
 
     nbCellsx, rx = divmod(lx, edge)
     nbCellsy, ry = divmod(ly, edge)
@@ -37,3 +37,24 @@ def cells():
     if rz: nbCellsz += 1
 
     return [[[[] for _ in range(nbCellsz)] for _ in range(nbCellsy)] for _ in range(nbCellsx)]
+
+
+def list_indices_at_range(r):
+    listIndices = []
+
+    for x in (r, -r):
+        for y in range(-r, r + 1):
+            for z in range(-r, r + 1):
+                listIndices.append((x, y, z))
+
+    for x in range(-r + 1, r):
+        for y in (-r, r):
+            for z in range(-r, r + 1):
+                listIndices.append((x, y, z))
+
+    for x in range(-r + 1, r):
+        for y in range(-r + 1, r):
+            for z in (-r, r):
+                listIndices.append((x, y, z))
+
+    return listIndices
