@@ -1,7 +1,8 @@
 import numpy as np
 from math import inf
 
-from utils_grid import norme
+from constants import l_min
+from utils_grid import norme, inGrid
 
 
 class Noeud:
@@ -88,3 +89,19 @@ class Noeud:
         xTempo.voisins[1] = c
 
         return xTempo.parent(xo, xgoal)  # on récupère donc le deuxième meilleur voisin
+
+    def line(self, other):
+        dist = norme(self, other)
+        numb_try = dist//l_min
+
+        coord1 = np.array([self.x, self.y, self.z])
+        coord2 = np.array([other.x, other.y, other.z])
+        coord_unitaire = (coord2-coord1)/numb_try
+
+        for i in range(numb_try):
+            coord_on_line = coord1 + i*coord_unitaire
+            if not inGrid(Noeud(coord_on_line[0], coord_on_line[1], coord_on_line[2])):
+                return False
+            else:
+                pass
+        return True
