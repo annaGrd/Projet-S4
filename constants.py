@@ -5,6 +5,7 @@ X = np.array([[0, 1000], [0, 1000], [0, 1000]])  # faire choisir une taille de g
 
 Xobs = np.array([])  # à compléter
 vObs = 0
+l_min = 10  # longueur minimale d'un obstacle
 
 for obs in Xobs:
     x = obs[0][1] - obs[0][0]
