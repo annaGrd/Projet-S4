@@ -203,7 +203,8 @@ class Tree:
 
         radius = 0
         extraRadius = 0
-        while extraRadius < 2: # Nombre arbitraire, designe le nombre de couches supplementaires a prendre en compte apres avoir trouve une node
+        empty = True
+        while extraRadius <= 2: # Nombre arbitraire, designe le nombre de couches supplementaires a prendre en compte apres avoir trouve une node
             radius += 1
             gap = list_indices_at_range(radius)
             for abscissa, ordinate, altitude in gap:
@@ -215,8 +216,10 @@ class Tree:
 
                 cell = self.cell[qx + abscissa][qy + ordinate][qz + altitude]
                 Xsi.extend(cell)
-                if Xsi != []:
-                    extraRadius += 1
+                if cell:
+                    empty = False
+            if not empty:
+                extraRadius += 1
         return Xsi
 
     def add_node_to_cell(self, x):
