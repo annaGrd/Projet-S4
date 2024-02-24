@@ -51,3 +51,11 @@ def mkeXsi(x, cell):
             Xsi.append(e)
 
     return Xsi
+
+
+def add_node_to_cell(x, cell):
+    qx = int(x.x // edge)
+    qy = int(x.y // edge)
+    qz = int(x.z // edge)
+
+    cell[qx][qy][qz].append(x)
