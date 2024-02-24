@@ -5,26 +5,9 @@ from noeud import Noeud
 from random import uniform
 import numpy as np
 from random_sampling import ellipse_sampling, uniform_sampling, line_sampling
-from utils_grid import norme, mkeXsi
+from utils_grid import norme, cells
 from constants import alpha, beta, kmax, rs, vFree, edge
 from math import pi
-
-
-def closest_node(xrand, cell):
-    Xsi = mkeXsi(xrand, cell)
-
-    if not Xsi : return None
-
-    minimumArg = Xsi[0]
-    minimumValue = norme(minimumArg, xrand)
-
-    for xi in Xsi:
-        value = norme(xi, xrand)
-        if minimumValue > value:
-            minimumArg = xi
-            minimumValue = value
-
-    return minimumArg
 
 
 class Tree:
@@ -39,6 +22,7 @@ class Tree:
         self.mem = list()
         self.xa = xa  # position du drone
         self.xgoal = xgoal  # faire choisir un point d'arrivée
+        self.cell = cells()
 
     def rand_node(self):
         xgoal = self.xgoal
@@ -92,13 +76,29 @@ class Tree:
         x0.voisins[0].append(x1)
         x0.voisins[1].append(c1)
 
+    def closest_node(self, xrand):
+        Xsi = self.mkeXsi(xrand)
+
+        if not Xsi: return None
+
+        minimumArg = Xsi[0]
+        minimumValue = norme(minimumArg, xrand)
+
+        for xi in Xsi:
+            value = norme(xi, xrand)
+            if minimumValue > value:
+                minimumArg = xi
+                minimumValue = value
+
+        return minimumArg
+
     def expansion_and_rewiring(self):
 
         xrand = self.rand_node()
 
-        xclosest = closest_node(xrand)
+        xclosest = self.closest_node(xrand)
 
-        if line(xclosest, xrand):
+        if xclosest.line(xrand):
             Xnear = self.find_nodes_near(xrand)
 
             if len(Xnear) < kmax or norme(xclosest, xrand) > rs:
@@ -114,7 +114,7 @@ class Tree:
             self.rewire_random_node()
         self.rewire_from_root()
 
-    def add_node(self, xnew, xclosest, Xnear, cell):  # tu comptes mettre les algos 3,4 et 5 dans ces trois fonctions ?
+    def add_node(self, xnew, xclosest, Xnear):
         xmin = xclosest
         cmin = xclosest.cost(self.traj[0], self.xgoal) + norme(xclosest, xnew)
 
@@ -122,18 +122,18 @@ class Tree:
 
             cnew = xnear.cost(self.traj[0], self.xgoal) + norme(xnear, xnew)
 
-            if cnew < cmin and line(xnear, xnew):
+            if cnew < cmin and xnear.line(xnew):
                 cmin = cnew
                 xmin = xnear
 
         self.Vt.append(xnew)
-        self.add_link(xmin)
+        self.add_link(xnew, xmin)
 
         # Ajout du nœud dans la case correspondante dans la grille
         qx = xnew.x // edge
         qy = xnew.y // edge
         qz = xnew.z // edge
-        cell[qx][qy][qz].append(xnew)
+        self.cell[qx][qy][qz].append(xnew)
 
     def rewire_random_node(self):
         t = time()
@@ -146,7 +146,7 @@ class Tree:
                 cold = xnear.cost(self.traj[0], self.xgoal)
                 cnew = xr.cost(self.traj[0], self.xgoal) + norme(xr, xnear)
 
-                if cnew < cold and line(xr, xnear):
+                if cnew < cold and xr.line(xnear):
                     pa = xnear.parent(self.traj[0], self.xgoal)
 
                     self.add_link(xr, xnear, cnew)
@@ -172,7 +172,7 @@ class Tree:
                 cold = xnear.cost(self.traj[0], self.xgoal)
                 cnew = xnear.cost(self.traj[0], self.xgoal) + norme(xs, xnear)
 
-                if cnew < cold and line(xs, xnear):
+                if cnew < cold and xs.line(xnear):
                     pa = xnear.parent(self.traj[0], self.xgoal)
 
                     self.add_link(xs, xnear, cnew)
@@ -183,7 +183,7 @@ class Tree:
                     self.mem.append(xnear)
 
     def find_nodes_near(self, x):
-        Xnear = mkeXsi(x)
+        Xnear = self.mkeXsi(x)
         epsilon = ((vFree * kmax) / pi * len(self.Vt)) ** .5
 
         if epsilon < rs: epsilon = rs
@@ -192,3 +192,24 @@ class Tree:
             if norme(x, xnear) < epsilon: Xnear.append(xnear)
 
         return Xnear
+
+    def mkeXsi(self, x):
+
+        Xsi = list()
+        qx = int(x.x // edge)
+        qy = int(x.y // edge)
+        qz = int(x.z // edge)
+        nodes = self.cell[qx][qy][qz]
+
+        for e in nodes:
+            if e != x:
+                Xsi.append(e)
+
+        return Xsi
+
+    def add_node_to_cell(self, x):
+        qx = int(x.x // edge)
+        qy = int(x.y // edge)
+        qz = int(x.z // edge)
+
+        self.cell[qx][qy][qz].append(x)
