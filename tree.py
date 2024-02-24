@@ -106,13 +106,13 @@ class Tree:
 
             if len(Xnear) < kmax or norme(xclosest, xrand) > rs:
                 self.add_node(xrand, xclosest, Xnear)
-                self.Qr.insert(xrand, 0)
+                self.Qr.insert(0, xrand)
                 """# Qr étant une pile, 
                 on pourrait plutôt utiliser la fin de la liste, jsp si ça sera mieux
                 - T'es sûr que Qr est une pile ? Dans l'algo 2, on rajoute des éléments par le début 
                 et dans l'algo 4, par la fin. A la limite, Qs est une pile, mais Qr, je ne crois pas ??"""
             else:
-                self.Qr.insert(xclosest, 0)
+                self.Qr.insert(0, xclosest)
 
             self.rewire_random_node()
         self.rewire_from_root()
@@ -181,12 +181,12 @@ class Tree:
                     self.mem.append(xnear)
 
     def find_nodes_near(self, x):
-        Xnear = self.mkeXsi(x)
-        epsilon = ((vFree * kmax) / pi * len(self.Vt)) ** .5
-
+        Xsi = self.mkeXsi(x)
+        epsilon = ((vFree * kmax) / (pi * len(self.Vt))) ** .5
         if epsilon < rs: epsilon = rs
 
-        for xnear in Xnear:
+        Xnear = []
+        for xnear in Xsi:
             if norme(x, xnear) < epsilon: Xnear.append(xnear)
 
         return Xnear
@@ -197,7 +197,7 @@ class Tree:
         qy = int(x.y // edge)
         qz = int(x.z // edge)
 
-        Xsi = self.cell[qx][qy][qz]
+        Xsi = list(self.cell[qx][qy][qz])
         if x in Xsi:
             Xsi.remove(x)
 

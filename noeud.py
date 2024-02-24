@@ -37,11 +37,11 @@ class Noeud:
         cmin = ci[0]
         pa = voisins[0]
 
-        for voisin in voisins:
+        for voisin_idx in range(len(voisins)):
 
-            if voisin[1] < cmin:
-                cmin = voisin[1]
-                pa = voisin[0]
+            if ci[voisin_idx] < cmin:
+                cmin = voisins[voisin_idx]
+                pa = ci[voisin_idx]
 
         return pa
 
@@ -51,6 +51,10 @@ class Noeud:
         En ayant connaissance des changements en amont, on n'aurait pas à tout recalculer.
         Utiliser blocked ?
         """
+
+        if self == xo:
+            self.ci = 0
+            return 0
 
         pa = self.parent(xo, xgoal)
         if pa == xo:
@@ -92,7 +96,7 @@ class Noeud:
 
     def line(self, other):
         dist = norme(self, other)
-        numb_try = dist//l_min
+        numb_try = int(dist//l_min)
 
         coord1 = np.array([self.x, self.y, self.z])
         coord2 = np.array([other.x, other.y, other.z])
