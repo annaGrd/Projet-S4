@@ -1,18 +1,17 @@
 import tarfile
 from time import time
 
-from Programme import mkeXsi
 from noeud import Noeud
 from random import uniform
 import numpy as np
 from random_sampling import ellipse_sampling, uniform_sampling, line_sampling
-from utils_grid import norme
+from utils_grid import norme, mkeXsi
 from constants import alpha, beta, kmax, rs, vFree, edge
 from math import pi
 
 
-def closest_node(xrand):
-    Xsi = mkeXsi(xrand)
+def closest_node(xrand, cell):
+    Xsi = mkeXsi(xrand, cell)
     minimumArg = Xsi[0]
     minimumValue = norme(minimumArg, xrand)
 
@@ -45,14 +44,12 @@ class Tree:
         xclose = self.traj[-1]
 
         if Pr > 1 - alpha:
-
             root = np.array([xo.x, xo.y, xo.z])
             goal = np.array([xgoal.x, xgoal.y, xgoal.z])
 
             return line_sampling(root, goal)
 
         elif Pr <= (1 - alpha) / beta or xclose != xgoal:
-
             return uniform_sampling()
 
         else:

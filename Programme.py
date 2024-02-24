@@ -8,19 +8,6 @@ from utils_grid import norme, cells
 cell = cells()
 
 
-def mkeXsi(x):
-
-    Xsi = list()
-    qx = x.x // edge
-    qy = x.y // edge
-    qz = x.z // edge
-    nodes = cell[qx][qy][qz][3]
-
-    for e in nodes:
-        if e != x:
-            Xsi.append(e)
-
-
 def main(xa, Xobs, xgoal):
 
     T = Tree([xa], Noeud(), Noeud())  # définir xa et xgoal

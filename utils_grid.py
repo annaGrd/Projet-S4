@@ -43,3 +43,15 @@ def cells():
             for cz in coordinatesz:
                 grid.append([cx, cy, cz, list()])
     return grid
+
+def mkeXsi(x, cell):
+
+    Xsi = list()
+    qx = int(x.x // edge)
+    qy = int(x.y // edge)
+    qz = int(x.z // edge)
+    nodes = cell[qx][qy][qz][3]
+
+    for e in nodes:
+        if e != x:
+            Xsi.append(e)
