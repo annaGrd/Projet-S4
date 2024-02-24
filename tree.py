@@ -128,12 +128,7 @@ class Tree:
 
         self.Vt.append(xnew)
         self.add_link(xnew, xmin)
-
-        # Ajout du nœud dans la case correspondante dans la grille
-        qx = xnew.x // edge
-        qy = xnew.y // edge
-        qz = xnew.z // edge
-        self.cell[qx][qy][qz].append(xnew)
+        self.add_node_to_cell(xnew)
 
     def rewire_random_node(self):
         t = time()
@@ -205,6 +200,38 @@ class Tree:
             if e != x:
                 Xsi.append(e)
 
+        empty = True
+        radius = 0
+        while empty:
+            radius += 1
+            gap = [i for i in range(-radius, radius+1)]
+            for abscissa in gap:
+                for ordinate in gap:
+                    for altitude in gap:
+                        """j'aimerais mettre une condition du type si l'indice n'est pas dans
+                        la liste, on ignore et on passe à la suite. N'étant point accoutumée 
+                        à l'usage des try and except, je t'invite à check si c'est correct"""
+                        try:
+                            cell = self.cell[qx + abscissa][qy + ordinate][qz + altitude]
+                        except IndexError:
+                            pass
+                        else:
+                            if cell:
+                                Xsi.extend(cell)
+                                empty = False
+
+        for i in range(2):  # choix arbitraire de prendre les deux rangs au-delà du rang de la première case non vide
+            radius += 1
+            gap = [i for i in range(-radius, radius + 1)]
+            for abscissa in gap:
+                for ordinate in gap:
+                    for altitude in gap:
+                        try:
+                            cell = self.cell[qx + abscissa][qy + ordinate][qz + altitude]
+                        except IndexError:
+                            pass
+                        else:
+                            Xsi.extend(cell)  
         return Xsi
 
     def add_node_to_cell(self, x):
