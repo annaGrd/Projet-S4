@@ -12,6 +12,9 @@ from math import pi
 
 def closest_node(xrand, cell):
     Xsi = mkeXsi(xrand, cell)
+
+    if not Xsi : return None
+
     minimumArg = Xsi[0]
     minimumValue = norme(minimumArg, xrand)
 
@@ -130,7 +133,7 @@ class Tree:
         qx = xnew.x // edge
         qy = xnew.y // edge
         qz = xnew.z // edge
-        cell[qx][qy][qz][3].append(xnew)
+        cell[qx][qy][qz].append(xnew)
 
     def rewire_random_node(self):
         t = time()

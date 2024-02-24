@@ -25,24 +25,18 @@ def inGrid(n):
 
 
 def cells():
-    grid = []
-    lx = X[0][1]  # lg selon x
-    ly = X[1][1]  # lg selon y
-    lz = X[2][1]  # lg selon z
-    qx, rx = divmod(lx, edge)
-    qy, ry = divmod(ly, edge)
-    qz, rz = divmod(lz, edge)
-    coordinatesx = [[i*edge, (i+1)*edge] for i in range(qx)]
-    coordinatesy = [[i * edge, (i + 1) * edge] for i in range(qy)]
-    coordinatesz = [[i * edge, (i + 1) * edge] for i in range(qz)]
-    if rx: coordinatesx += [[qx * edge, qx * edge + rx]]
-    if ry: coordinatesy += [[qy * edge, qy * edge + ry]]
-    if rz: coordinatesz += [[qz * edge, qz * edge + rz]]
-    for cx in coordinatesx:
-        for cy in coordinatesy:
-            for cz in coordinatesz:
-                grid.append([cx, cy, cz, list()])
-    return grid
+    lx = X[0][1] - X[0][0]  # lg selon x
+    ly = X[1][1] - X[1][0]  # lg selon y
+    lz = X[2][1] - X[1][0]  # lg selon z
+
+    nbCellsx, rx = divmod(lx, edge)
+    nbCellsy, ry = divmod(ly, edge)
+    nbCellsz, rz = divmod(lz, edge)
+    if rx: nbCellsx += 1
+    if ry: nbCellsy += 1
+    if rz: nbCellsz += 1
+
+    return [[[[] for _ in range(nbCellsz)] for _ in range(nbCellsy)] for _ in range(nbCellsx)]
 
 def mkeXsi(x, cell):
 
@@ -50,8 +44,10 @@ def mkeXsi(x, cell):
     qx = int(x.x // edge)
     qy = int(x.y // edge)
     qz = int(x.z // edge)
-    nodes = cell[qx][qy][qz][3]
+    nodes = cell[qx][qy][qz]
 
     for e in nodes:
         if e != x:
             Xsi.append(e)
+
+    return Xsi
