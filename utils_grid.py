@@ -27,7 +27,7 @@ def inGrid(n):
 def cells():
     lx = X[0][1] - X[0][0]  # lg selon x
     ly = X[1][1] - X[1][0]  # lg selon y
-    lz = X[2][1] - X[1][0]  # lg selon z
+    lz = X[2][1] - X[2][0]  # lg selon z
 
     nbCellsx, rx = divmod(lx, edge)
     nbCellsy, ry = divmod(ly, edge)
