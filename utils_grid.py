@@ -37,25 +37,3 @@ def cells():
     if rz: nbCellsz += 1
 
     return [[[[] for _ in range(nbCellsz)] for _ in range(nbCellsy)] for _ in range(nbCellsx)]
-
-def mkeXsi(x, cell):
-
-    Xsi = list()
-    qx = int(x.x // edge)
-    qy = int(x.y // edge)
-    qz = int(x.z // edge)
-    nodes = cell[qx][qy][qz]
-
-    for e in nodes:
-        if e != x:
-            Xsi.append(e)
-
-    return Xsi
-
-
-def add_node_to_cell(x, cell):
-    qx = int(x.x // edge)
-    qy = int(x.y // edge)
-    qz = int(x.z // edge)
-
-    cell[qx][qy][qz].append(x)
