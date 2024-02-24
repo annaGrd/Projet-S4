@@ -2,10 +2,8 @@ from math import inf
 from time import time
 from tree import Tree
 from noeud import Noeud
-from constants import edge, rprox
-from utils_grid import norme, cells
-
-cell = cells()
+from constants import rprox
+from utils_grid import norme
 
 
 def main(xa, Xobs, xgoal):
@@ -27,6 +25,7 @@ def main(xa, Xobs, xgoal):
     return  # ?
 
 # Algo 6
+
 
 def deadEnd(T, x):
     if len(x.voisins[0]) < 2:  # si n'a qu'un voisin (juste son parent)
@@ -54,7 +53,7 @@ def plan(T):
         path = [T.traj[0]]
         while deadEnd(T, path[-1]):
 
-            path.append(path[-1].bestChild(T.traj[0],T.xgoal))
+            path.append(path[-1].bestChild(T.traj[0], T.xgoal))
 
         path[-1].block = True
         if path[-1].fc(T.traj[0], T.xgoal) == T.traj[-1].fc(T.traj[0], T.xgoal):
