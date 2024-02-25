@@ -8,6 +8,13 @@ obstacles est une liste contenant les obstacles dynamiques de la forme [x, y, z,
 A-t-on besoin de propager le x.block = True aux enfants d'un noeud dans la range rb ? 
 En soi, le ci des enfants qui passe à l'infini est suffisant, non ?
 J'ai l'impression que c'est ce qu'ils expliquent dans la section Blocking Nodes by Dynamic Obstacles, p.5
+
+C'est pas pour tout de suite mais, dans l'optique d'utiliser des obstacles dynamiques,
+est-ce qu'on ne ferait pas prédire une trajectoire à notre programme avec un xgoal statique 
+et notre obstacle dynamique en temps que drone. Ainsi, on récupère la trajectoire et 
+paf, on a une trajectoire établie et qui marche, pour notre obstacle. Si l'obstacle dynamique
+atteint l'extrémité de sa trajectoire, on peut le faire aller dans l'autre sens ou calculer
+une nouvelle trajectoire avec un xgoal aléatoire.
 """
 
 
