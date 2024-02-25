@@ -186,6 +186,11 @@ class Tree:
         qx = int(x.x // edge)
         qy = int(x.y // edge)
         qz = int(x.z // edge)
+
+        if qx == self.nbcellx: qx -= 1
+        if qy == self.nbcelly: qy -= 1
+        if qz == self.nbcellz: qz -= 1
+
         Xsi = list(self.cell[qx][qy][qz])
         if x in Xsi:
             Xsi.remove(x)
@@ -220,4 +225,4 @@ class Tree:
 
     def goal_reached(self):
         xclose = self.closest_node(self.xgoal)
-        return norme(self.xgoal, xclose) < rs and xclose.line(self.xgoal), xclose
+        return norme(self.xgoal, xclose) < .5 and xclose.line(self.xgoal), xclose
