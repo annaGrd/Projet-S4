@@ -31,8 +31,8 @@ class Noeud:
         ci = self.voisins[1]
         # prendre celui avec le ci plus petit que self
 
-        for i in range(len(ci)):
-            ci[i] = voisins[i].fc(xo, xgoal)
+        #for i in range(len(ci)):
+        #    ci[i] = voisins[i].fc(xo, xgoal)
 
         cmin = ci[0]
         pa = voisins[0]
@@ -67,7 +67,7 @@ class Noeud:
             return inf
 
         else:
-            ci = pa.cost() + norme(self, pa)
+            ci = pa.cost(xo, xgoal) + norme(self, pa)
             self.ci = ci
             return ci
 
