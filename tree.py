@@ -221,6 +221,10 @@ class Tree:
         qy = int(x.y // edge)
         qz = int(x.z // edge)
 
+        if qx == self.nbcellx: qx -= 1
+        if qy == self.nbcelly: qy -= 1
+        if qz == self.nbcellz: qz -= 1
+
         self.cell[qx][qy][qz].append(x)
 
     def goal_reached(self):
