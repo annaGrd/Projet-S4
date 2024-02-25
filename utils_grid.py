@@ -14,8 +14,8 @@ def inGrid(n):
         return False
 
     for obs in Xobs:
-        if (obs[0][0] >= n.x >= obs[0][1]) and (obs[1][0] >= n.y >= obs[1][1]) and (
-                obs[2][0] >= n.z >= obs[2][1]):
+        if (obs[0][0] <= n.x <= obs[0][1]) and (obs[1][0] <= n.y <= obs[1][1]) and (
+                obs[2][0] <= n.z <= obs[2][1]):
             return False
     return True
 

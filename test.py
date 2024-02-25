@@ -8,7 +8,6 @@ from utils_grid import norme
 
 animate = True
 render = True
-if animate : render = False
 
 fig = plt.figure()
 ax = fig.add_subplot(projection="3d")
