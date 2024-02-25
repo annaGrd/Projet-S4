@@ -13,7 +13,7 @@ class Noeud:
         self.block = False  # être exploré ou non
         self.marqueur = False  # pour fc, savoir si bloqué pour fc
         self.ci = float("inf")
-        self.voisins = [list(), list()]  # fusionner
+        self.voisins = []
 
     def __eq__(self, other):
         if self.x == other.x and self.y == other.y and self.z == other.z:
@@ -21,64 +21,47 @@ class Noeud:
         else:
             return False
 
-    def parent(self, xo, xgoal):
+    def parent(self, xo):
 
         # si on demande le parent de la racine
         if self == xo:
             return None
 
-        voisins = self.voisins[0]
-        ci = self.voisins[1]
         # prendre celui avec le ci plus petit que self
 
-        #for i in range(len(ci)):
-        #    ci[i] = voisins[i].fc(xo, xgoal)
+        pa = self.voisins[0]
+        cmin = pa.ci
 
-        cmin = ci[0]
-        pa = voisins[0]
+        for voisin in self.voisins:
 
-        for voisin_idx in range(len(voisins)):
-
-            if ci[voisin_idx] < cmin:
-                pa = voisins[voisin_idx]
-                cmin = ci[voisin_idx]
+            if voisin.ci < cmin:
+                pa = voisin
+                cmin = pa.ci
 
         return pa
 
-    def cost(self, xo, xgoal):
+    def recalculate_child_costs(self):
 
-        """ Pas des plus optimisés pour le moment, recalcule le ci à chaque fois.
-        En ayant connaissance des changements en amont, on n'aurait pas à tout recalculer.
-        Utiliser blocked ?
+        """
+        A modifier pour les obstacles et la dynamique
         """
 
-        if self == xo:
-            self.ci = 0
-            return 0
+        for x in self.voisins:
+            if x.ci < self.ci: continue
 
-        pa = self.parent(xo, xgoal)
-        if pa == xo:
-            ci = norme(xo, self)
-            self.ci = ci
-            return ci
+            potentialNewCost = self.ci + norme(x, self)
+            if potentialNewCost != x.ci:
+                x.ci = potentialNewCost
+                x.recalculate_child_costs()
 
-        elif pa.ci == inf or pa.marqueur:  # pas sûre d'avoir besoin des deux conditions
-            self.ci = inf
-            return inf
-
-        else:
-            ci = pa.cost(xo, xgoal) + norme(self, pa)
-            self.ci = ci
-            return ci
-
-    def fc(self, xo, xgoal):
+    def fc(self, xgoal):
 
         # à modifier si on passe à un xgoal dynamique
         if self.marqueur:  # pas sûre que cette condition soit utile avec l'existence de cost()
             return inf
 
         else:
-            return self.cost(xo, xgoal) + norme(self, xgoal)
+            return self.ci + norme(self, xgoal)
 
     def bestChild(self, xo, xgoal):
 
@@ -96,14 +79,14 @@ class Noeud:
 
     def line(self, other):
         dist = norme(self, other)
-        numb_try = int(dist//l_min)
+        numb_try = int(dist // l_min)
 
         coord1 = np.array([self.x, self.y, self.z])
         coord2 = np.array([other.x, other.y, other.z])
-        coord_unitaire = (coord2-coord1)/numb_try
+        coord_unitaire = (coord2 - coord1) / numb_try
 
         for i in range(numb_try):
-            coord_on_line = coord1 + i*coord_unitaire
+            coord_on_line = coord1 + i * coord_unitaire
             if not inGrid(Noeud(coord_on_line[0], coord_on_line[1], coord_on_line[2])):
                 return False
             else:

@@ -39,7 +39,7 @@ class Tree:
 
             return line_sampling(x1, goal)
 
-        elif Pr <= (1 - alpha) / beta or not IsGoalReached:
+        elif Pr <= (1 - alpha) / beta or True : #not IsGoalReached:
             return uniform_sampling()
 
         else:
@@ -59,25 +59,14 @@ class Tree:
         else:
             self.Et.remove((x1, x0))
 
-        indexX1 = x0.voisins[0].index(x1)
-        del x0.voisins[0][indexX1]
-        del x0.voisins[1][indexX1]
+        x0.voisins.remove(x1)
+        x1.voisins.remove(x0)
 
-        indexX0 = x1.voisins[0].index(x0)
-        del x1.voisins[0][indexX0]
-        del x1.voisins[1][indexX0]
-
-    def add_link(self, x0, x1, c0=None, c1=None):
-        if c0 is None:
-            c0 = x0.ci
-        if c1 is None:
-            c1 = x1.ci
+    def add_link(self, x0, x1):
 
         self.Et.append((x0, x1))  # faire un dictionnaire
-        x1.voisins[0].append(x0)
-        x1.voisins[1].append(c0)
-        x0.voisins[0].append(x1)
-        x0.voisins[1].append(c1)
+        x1.voisins.append(x0)
+        x0.voisins.append(x1)
 
     def closest_node(self, xrand):
         Xsi = self.mkeXsi(xrand)
@@ -119,11 +108,11 @@ class Tree:
 
     def add_node(self, xnew, xclosest, Xnear):
         xmin = xclosest
-        cmin = xclosest.cost(self.traj[0], self.xgoal) + norme(xclosest, xnew)
+        cmin = xclosest.ci + norme(xclosest, xnew)
 
         for xnear in Xnear:
 
-            cnew = xnear.cost(self.traj[0], self.xgoal) + norme(xnear, xnew)
+            cnew = xnear.ci + norme(xnear, xnew)
 
             if cnew < cmin and xnear.line(xnew):
                 cmin = cnew
@@ -132,6 +121,7 @@ class Tree:
         self.Vt.append(xnew)
         self.add_link(xnew, xmin)
         self.add_node_to_cell(xnew)
+        xnew.ci = xmin.ci + norme(xmin, xnew)
 
     def rewire_random_node(self):
         t = time()
@@ -141,14 +131,15 @@ class Tree:
             Xnear = self.find_nodes_near(xr)
 
             for xnear in Xnear:
-                cold = xnear.cost(self.traj[0], self.xgoal)
-                cnew = xr.cost(self.traj[0], self.xgoal) + norme(xr, xnear)
+                cold = xnear.ci
+                cnew = xr.ci + norme(xr, xnear)
 
                 if cnew < cold and xr.line(xnear):
-                    pa = xnear.parent(self.traj[0], self.xgoal)
+                    pa = xnear.parent(self.traj[0])
 
-                    self.add_link(xr, xnear, cnew)
+                    self.add_link(xr, xnear)
                     self.remove_link(xnear, pa)
+                    xr.recalculate_child_costs()
 
                     self.Qr.append(xnear)
 
@@ -165,14 +156,15 @@ class Tree:
 
             for xnear in Xnear:
 
-                cold = xnear.cost(self.traj[0], self.xgoal)
-                cnew = xnear.cost(self.traj[0], self.xgoal) + norme(xs, xnear)
+                cold = xnear.ci
+                cnew = xnear.ci + norme(xs, xnear)
 
                 if cnew < cold and xs.line(xnear):
-                    pa = xnear.parent(self.traj[0], self.xgoal)
+                    pa = xnear.parent(self.traj[0])
 
-                    self.add_link(xs, xnear, cnew)
+                    self.add_link(xs, xnear)
                     self.remove_link(xnear, pa)
+                    xs.recalculate_child_costs()
 
                 if xnear not in self.mem:  # à ajuster quand on gérera les obstacles dynamiques
                     self.Qs.append(xnear)
