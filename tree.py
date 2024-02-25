@@ -6,7 +6,7 @@ from random import uniform
 import numpy as np
 from random_sampling import ellipse_sampling, uniform_sampling, line_sampling
 from utils_grid import norme, cells, list_indices_at_range
-from constants import alpha, beta, kmax, rs, vFree, edge
+from constants import alpha, beta, kmax, rs, vFree, edge, rg
 from math import pi
 
 
@@ -242,4 +242,4 @@ class Tree:
 
     def goal_reached(self):
         xclose = self.closest_node(self.xgoal)
-        return norme(self.xgoal, xclose) < .5 and xclose.line(self.xgoal), xclose
+        return norme(self.xgoal, xclose) < rg and xclose.line(self.xgoal), xclose

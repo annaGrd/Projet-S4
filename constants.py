@@ -29,3 +29,4 @@ beta = 2  # arbitraire
 update_time = 10  # arbitraire, durée entre deux updates
 safety_radius = 5  # arbitraire, rayon supplémentaire pour être sûr de prendre tous les noeuds dans la range d'un obstacle dynamique
 ro = 20 # arbitraire
+rg = .5 # arbitraire
