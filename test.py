@@ -5,16 +5,19 @@ import matplotlib.pyplot as plt
 
 xa = Noeud()
 xa.ci = 0
-xgoal = Noeud(50, 50, 0)
+xgoal = Noeud(50, 50, 25)
 
 T = Tree([xa], xa, xgoal)
 T.add_node_to_cell(xa)
 T.traj = [xa]
 
-for _ in range(200):
+for _ in range(100):
     t = time()
     T.expansion_and_rewiring()
     print(time() - t)
+
+endTraj = T.closest_node(T.xgoal)
+print(endTraj.x, endTraj.y, endTraj.z, endTraj.ci)
 
 fig = plt.figure()
 ax = fig.add_subplot(projection="3d")

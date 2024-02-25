@@ -32,12 +32,12 @@ def ellipse_sampling(root, goal, a, b):
     return newNode
 
 
-def line_sampling(root, goal):
+def line_sampling(x1, goal):
     r = uniform(0, 1)
-    new = (1-r)*root + r*goal
+    new = (1-r) * x1 + r * goal
     newNode = Noeud(new[0], new[1], new[2])
 
-    if not inGrid(newNode): return line_sampling(root, goal)
+    if not inGrid(newNode): return line_sampling(x1, goal)
 
     return newNode
 

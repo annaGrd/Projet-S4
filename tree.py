@@ -31,15 +31,15 @@ class Tree:
         xgoal = self.xgoal
         xo = self.traj[0]
         Pr = uniform(0, 1)
-        xclose = self.traj[-1]
+        IsGoalReached, xclose = self.goal_reached()
 
         if Pr > 1 - alpha:
-            root = np.array([xo.x, xo.y, xo.z])
+            x1 = np.array([xclose.x, xclose.y, xclose.z])
             goal = np.array([xgoal.x, xgoal.y, xgoal.z])
 
-            return line_sampling(root, goal)
+            return line_sampling(x1, goal)
 
-        elif Pr <= (1 - alpha) / beta or xclose != xgoal:
+        elif Pr <= (1 - alpha) / beta or not IsGoalReached:
             return uniform_sampling()
 
         else:
@@ -226,3 +226,7 @@ class Tree:
         qz = int(x.z // edge)
 
         self.cell[qx][qy][qz].append(x)
+
+    def goal_reached(self):
+        xclose = self.closest_node(self.xgoal)
+        return norme(self.xgoal, xclose) < rs and xclose.line(self.xgoal), xclose
