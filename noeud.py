@@ -43,7 +43,10 @@ class Noeud:
     def recalculate_child_costs(self):
 
         """
-        A modifier pour les obstacles et la dynamique
+        L'idée ici c'est qu'à chaque fois qu'il y a une modification dans les liens entre les noeuds, on calcule
+        récursivement les couts des noeuds qui descendent du nouveau noeud parent (par ex xs ou xr pour les algo 4 et 5)
+
+        Pour les obstacles il suffira de mettre le noeud bloqué avec un coup infini et d'exécuter cette fonction
         """
 
         for x in self.voisins:
