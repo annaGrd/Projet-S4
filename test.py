@@ -11,7 +11,7 @@ T = Tree([xa], xa, xgoal)
 T.add_node_to_cell(xa)
 T.traj = [xa]
 
-for _ in range(100):
+for _ in range(25):
     t = time()
     T.expansion_and_rewiring()
     print(time() - t)
@@ -27,6 +27,8 @@ for node in T.Vt:
         color = "green"
     if node in T.Qr:
         color = "blue"
+    if node == xa:
+        color = "black"
     ax.scatter(node.x, node.y, node.z, color=color)
 
 for node1, node2 in T.Et:

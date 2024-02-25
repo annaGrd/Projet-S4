@@ -39,12 +39,12 @@ class Tree:
 
             return line_sampling(x1, goal)
 
-        elif Pr <= (1 - alpha) / beta or True : #not IsGoalReached:
+        elif Pr <= (1 - alpha) / beta or not IsGoalReached:
             return uniform_sampling()
 
         else:
             cmin = norme(xo, xgoal)
-            cbest = xgoal.ci  # est-ce bien la distance entre xo et xgoal, pas sur
+            cbest = xclose.ci  # est-ce bien la distance entre xo et xgoal, pas sur
             a = cbest / 2
             b = (cbest ** 2 + cmin ** 2) ** 0.5 / 2
 
@@ -183,7 +183,6 @@ class Tree:
         return Xnear
 
     def mkeXsi(self, x):
-
         qx = int(x.x // edge)
         qy = int(x.y // edge)
         qz = int(x.z // edge)

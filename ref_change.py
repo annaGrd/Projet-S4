@@ -28,14 +28,14 @@ def rotaPhi(phi, vect):  # phi angle de latitude
 
     mat = np.array([[1, 0, 0], [0, sin(phi), -cos(phi)], [0, cos(phi), sin(phi)]])
 
-    return vect*mat
+    return np.matmul(vect, mat)
 
 
 def rotaTheta(theta, vect):
 
     mat = np.array([[sin(theta), -cos(theta), 0], [cos(theta), sin(theta), 0], [0, 0, 1]])
 
-    return vect*mat
+    return np.matmul(vect, mat)
 
 
 def reference_change(root, goal, new):
