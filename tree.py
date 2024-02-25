@@ -10,6 +10,15 @@ from constants import alpha, beta, kmax, rs, vFree, edge
 from math import pi
 
 
+def reduce_distance_to_rs(x0, x1):
+    coordinatesX1 = np.array([x1.x, x1.y, x1.z])
+    coordinatesX0 = np.array([x0.x, x0.y, x0.z])
+
+    coordinatesNewX = (coordinatesX1 - coordinatesX0) / norme(x1, x0) * rs + coordinatesX0
+    newX = Noeud(coordinatesNewX[0], coordinatesNewX[1], coordinatesNewX[2])
+    return newX
+
+
 class Tree:
     def __init__(self, noeuds=None, xa=Noeud(), xgoal=Noeud()):
         if noeuds is None:
@@ -94,6 +103,10 @@ class Tree:
             Xnear = self.find_nodes_near(xrand)
 
             if len(Xnear) < kmax or norme(xclosest, xrand) > rs:
+
+                if norme(xclosest, xrand) > rs:
+                    xrand = reduce_distance_to_rs(xclosest, xrand)
+
                 self.add_node(xrand, xclosest, Xnear)
                 self.Qr.insert(0, xrand)
                 """# Qr étant une pile, 
@@ -198,7 +211,7 @@ class Tree:
         radius = 0
         extraRadius = 0
         empty = True
-        while extraRadius <= 2: # Nombre arbitraire, designe le nombre de couches supplementaires a prendre en compte apres avoir trouve une node
+        while extraRadius <= 2 and radius <= max(self.nbcellx, self.nbcelly, self.nbcellz): # Nombre arbitraire, designe le nombre de couches supplementaires a prendre en compte apres avoir trouve une node
             radius += 1
             gap = list_indices_at_range(radius)
             for abscissa, ordinate, altitude in gap:
