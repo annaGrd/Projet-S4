@@ -49,6 +49,10 @@ def update_block(T, obstacles):
 
 
 def calcul_inrange(T, obs):
+    """Choix d'un rb adapté à la vitesse.
+    Dans le papier, j'imagine que les obstacles dynamiques se déplacent à la même vitesse,
+    donc pas besoin de faire un rb adapté à chaque obstacle dynamique, mais j'imagine que
+    qui peut le plus, peut le moins."""
     rb = update_time * obs[3] + safety_radius
 
     qx = int(obs[0] // edge)

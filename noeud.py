@@ -10,8 +10,8 @@ class Noeud:
         self.x = x
         self.y = y
         self.z = z
-        self.block = False  # être exploré ou non
-        self.marqueur = False  # pour fc, savoir si bloqué pour fc
+        self.block = False  # bloqué par obstacle dynamique
+        self.already_seen = False  # vu ou non par l'algo 6 pour le xgoal actuel
         self.ci = float("inf")
         self.voisins = []
 
@@ -43,13 +43,13 @@ class Noeud:
     def recalculate_child_costs(self):
 
         """
-        L'idée ici c'est qu'à chaque fois qu'il y a une modification dans les liens entre les noeuds, on calcule
-        récursivement les couts des noeuds qui descendent du nouveau noeud parent (par ex xs ou xr pour les algo 4 et 5)
+        L'idée ici, c'est qu'à chaque fois qu'il y a une modification dans les liens entre les noeuds, on calcule
+        récursivement les couts des noeuds qui descendent du nouveau nœud parent (par ex xs ou xr pour les algos 4 et 5)
 
-        Pour les obstacles il suffira de mettre le noeud bloqué avec un coup infini et d'exécuter cette fonction
+        Pour les obstacles, il suffira de mettre le nœud bloqué avec un coup infini et d'exécuter cette fonction
 
-        Dans le papier ils recalculent le cout uniquement quand il y a besoin, c'est vrai qui c'est mieux mais si cette
-        technique suffit ce sera plus simple
+        Dans le papier, ils recalculent le cout uniquement quand il y a besoin, c'est vrai qui c'est mieux mais, si cette
+        technique suffit, ce sera plus simple
         """
 
         for x in self.voisins:
@@ -62,8 +62,10 @@ class Noeud:
 
     def fc(self, xgoal):
 
-        # à modifier si on passe à un xgoal dynamique
-        if self.marqueur:  # pas sûre que cette condition soit utile avec l'existence de cost()
+        """ À modifier si on passe à un xgoal dynamique → je crois que la gestion
+        de self.ci qui passe à l'infini est déjà gérée par recalculate_child_costs,
+        donc, on n'a pas à changer fc, je crois"""
+        if self.already_seen:
             return inf
 
         else:
@@ -71,7 +73,7 @@ class Noeud:
 
     def bestChild(self, xo, xgoal):
 
-        v = self.voisins[0]
+        v = self.voisins
         pa = self.parent(xo)
         fcs = [x.fc(xo, xgoal) for x in v if x != pa]
 

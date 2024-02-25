@@ -6,6 +6,7 @@ X = np.array([[0, 100], [0, 100], [0, 100]])  # faire choisir une taille de gril
 Xobs = np.array([])  # à compléter
 vObs = 0
 l_min = 10  # longueur minimale d'un obstacle
+k = 100 # nombre de points max dans la trajectoire
 
 for obs in Xobs:
     x = obs[0][1] - obs[0][0]
@@ -28,5 +29,5 @@ beta = 2  # arbitraire
 
 update_time = 10  # arbitraire, durée entre deux updates
 safety_radius = 5  # arbitraire, rayon supplémentaire pour être sûr de prendre tous les noeuds dans la range d'un obstacle dynamique
-ro = 20 # arbitraire
+ro = 10 # arbitraire
 rg = .5 # arbitraire
