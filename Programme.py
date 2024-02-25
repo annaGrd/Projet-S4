@@ -21,6 +21,7 @@ def main(xa, Xobs, xgoal):
 
             T.traj.pop(0)
             T.traj[0].recalculate_child_costs()
+            T.restart = True
             T.Qs = list()
         # envoyer la traj au drone, il va vers xo
     return  # ?

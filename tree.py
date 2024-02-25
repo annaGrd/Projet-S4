@@ -35,6 +35,8 @@ class Tree:
         self.nbcellx = len(self.cell)
         self.nbcelly = len(self.cell[0])
         self.nbcellz = len(self.cell[0][0])
+        self.restart = False
+        self.rewire_radius = .0
 
     def rand_node(self):
         xgoal = self.xgoal
@@ -106,10 +108,6 @@ class Tree:
 
                 self.add_node(xrand, xclosest, Xnear)
                 self.Qr.insert(0, xrand)
-                """# Qr étant une pile, 
-                on pourrait plutôt utiliser la fin de la liste, jsp si ça sera mieux
-                - T'es sûr que Qr est une pile ? Dans l'algo 2, on rajoute des éléments par le début 
-                et dans l'algo 4, par la fin. A la limite, Qs est une pile, mais Qr, je ne crois pas ??"""
             else:
                 self.Qr.insert(0, xclosest)
 
@@ -179,6 +177,7 @@ class Tree:
                 if xnear not in self.mem:  # à ajuster quand on gérera les obstacles dynamiques
                     self.Qs.append(xnear)
                     self.mem.append(xnear)
+            self.rewire_radius = xs.ci
 
     def find_nodes_near(self, x):
         Xsi = self.mkeXsi(x)
