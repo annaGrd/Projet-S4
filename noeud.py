@@ -48,8 +48,8 @@ class Noeud:
 
         Pour les obstacles il suffira de mettre le noeud bloqué avec un coup infini et d'exécuter cette fonction
 
-        Dans le papier ils recalculent le cout quand on appelle la fonction (et c'est vrai qu'au niveau performances
-        c'est mieux) mais en vrai si ça c'est suffisant ça sera plus simple
+        Dans le papier ils recalculent le cout uniquement quand il y a besoin, c'est vrai qui c'est mieux mais si cette
+        technique suffit ce sera plus simple
         """
 
         for x in self.voisins:
