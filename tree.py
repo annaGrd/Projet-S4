@@ -104,9 +104,6 @@ class Tree:
 
             if len(Xnear) < kmax or norme(xclosest, xrand) > rs:
 
-                if norme(xclosest, xrand) > rs:
-                    xrand = reduce_distance_to_rs(xclosest, xrand)
-
                 self.add_node(xrand, xclosest, Xnear)
                 self.Qr.insert(0, xrand)
                 """# Qr étant une pile, 
