@@ -10,11 +10,9 @@ def norme(x1, x2):
 
 def inGrid(n):
     for obs in Xobs:
-        if (obs[0][0] >= n.x or n.x >= obs[0][1]) or (obs[1][0] >= n.y or n.y >= obs[1][1]) or (
-                obs[2][0] >= n.z or n.z >= obs[2][1]):
+        if (obs[0][0] >= n.x >= obs[0][1]) and (obs[1][0] >= n.y >= obs[1][1]) and (
+                obs[2][0] >= n.z >= obs[2][1]):
             return False
-        else:
-            pass
     return True
 
 
