@@ -135,7 +135,7 @@ class Tree:
 
     def rewire_random_node(self):
         t = time()
-        while t - time() < 100 and len(self.Qr) > 0:  # Temps arbitraire
+        while t - time() < .01 and len(self.Qr) > 0:  # Temps arbitraire
 
             xr = self.Qr.pop(0)
             Xnear = self.find_nodes_near(xr)
@@ -150,8 +150,7 @@ class Tree:
                     self.add_link(xr, xnear, cnew)
                     self.remove_link(xnear, pa)
 
-                    if xnear not in self.Qr:
-                        self.Qr.append(xnear)
+                    self.Qr.append(xnear)
 
     def rewire_from_root(self):
 
@@ -160,8 +159,7 @@ class Tree:
             self.mem = list()
 
         t = time()
-        while t - time() < 100 and self.Qs:
-
+        while t - time() < .01 and self.Qs:
             xs = self.Qs.pop(0)
             Xnear = self.find_nodes_near(xs)
 

@@ -22,6 +22,6 @@ edge = 10  # arbitraire, taille d'une case, choisir en fonction de la taille des
 
 # Algo 2
 kmax = 5  # arbitraire
-rs = 0.5  # arbitraire
+rs = 5  # arbitraire
 alpha = 0.1  # arbitraire
 beta = 2  # arbitraire
