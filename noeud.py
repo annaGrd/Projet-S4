@@ -72,16 +72,19 @@ class Noeud:
     def bestChild(self, xo, xgoal):
 
         v = self.voisins[0]
-        c = self.voisins[1]
+        pa = self.parent(xo)
+        fcs = [x.fc(xo, xgoal) for x in v if x != pa]
 
-        rg = v.index(self.parent(xo, xgoal))
-        v.pop(rg)  # retire le parent
-        c.pop(rg)  # et son coût
-        xTempo = Noeud()
-        xTempo.voisins[0] = v
-        xTempo.voisins[1] = c
+        fc_min = fcs[0]
+        best_child = v[0]
 
-        return xTempo.parent(xo, xgoal)  # on récupère donc le deuxième meilleur voisin
+        for voisin_idx in range(len(v)):
+
+            if fcs[voisin_idx] < fc_min:
+                best_child = v[voisin_idx]
+                fc_min = fcs[voisin_idx]
+
+        return best_child
 
     def line(self, other):
         dist = norme(self, other)
