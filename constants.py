@@ -1,7 +1,7 @@
 import numpy as np
 
 # Généralités
-X = np.array([[0, 1000], [0, 1000], [0, 1000]])  # faire choisir une taille de grille
+X = np.array([[0, 100], [0, 100], [0, 100]])  # faire choisir une taille de grille
 
 Xobs = np.array([])  # à compléter
 vObs = 0

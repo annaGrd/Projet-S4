@@ -182,7 +182,8 @@ class Tree:
 
     def find_nodes_near(self, x):
         Xsi = self.mkeXsi(x)
-        epsilon = ((vFree * kmax) / (pi * len(self.Vt))) ** .5
+        epsilon = vFree ** (1/3) * ((3*kmax)/(4*pi*len(self.Vt))) ** (1/3)  # Maintenant qu'on est en 3D, mu(B_epsilon) = 4/3*pi*epsilon**3
+        # vFree est sorti de la racine principale pour eviter les overflow errors
         if epsilon < rs: epsilon = rs
 
         Xnear = []
@@ -196,7 +197,6 @@ class Tree:
         qx = int(x.x // edge)
         qy = int(x.y // edge)
         qz = int(x.z // edge)
-
         Xsi = list(self.cell[qx][qy][qz])
         if x in Xsi:
             Xsi.remove(x)

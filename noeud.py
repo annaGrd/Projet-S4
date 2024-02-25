@@ -40,8 +40,8 @@ class Noeud:
         for voisin_idx in range(len(voisins)):
 
             if ci[voisin_idx] < cmin:
-                cmin = voisins[voisin_idx]
-                pa = ci[voisin_idx]
+                pa = voisins[voisin_idx]
+                cmin = ci[voisin_idx]
 
         return pa
 
