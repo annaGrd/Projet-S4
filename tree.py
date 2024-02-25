@@ -28,7 +28,6 @@ class Tree:
         self.Qs = list()
         self.Qr = list()
         self.traj = list()
-        self.mem = list()
         self.xa = xa  # position du drone
         self.xgoal = xgoal  # faire choisir un point d'arrivée
         self.cell = cells()
@@ -155,7 +154,6 @@ class Tree:
 
         if not self.Qs:
             self.Qs.append(self.traj[0])
-            self.mem = list()
 
         t = time()
         while t - time() < .01 and self.Qs:
@@ -174,15 +172,14 @@ class Tree:
                     self.remove_link(xnear, pa)
                     xs.recalculate_child_costs()
 
-                if xnear not in self.mem:  # à ajuster quand on gérera les obstacles dynamiques
+                if xnear not in self.Qs and self.restart:  # à ajuster quand on gérera les obstacles dynamiques
                     self.Qs.append(xnear)
-                    self.mem.append(xnear)
             self.rewire_radius = xs.ci
 
     def find_nodes_near(self, x):
         Xsi = self.mkeXsi(x)
         epsilon = vFree ** (1/3) * ((3*kmax)/(4*pi*len(self.Vt))) ** (1/3)  # Maintenant qu'on est en 3D, mu(B_epsilon) = 4/3*pi*epsilon**3
-        # vFree est sorti de la racine principale pour eviter les overflow errors
+        # vFree est sorti de la racine principale pour éviter les overflow errors
         if epsilon < rs: epsilon = rs
 
         Xnear = []
