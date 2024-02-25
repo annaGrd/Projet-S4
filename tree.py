@@ -172,7 +172,7 @@ class Tree:
                     self.remove_link(xnear, pa)
                     xs.recalculate_child_costs()
 
-                if xnear not in self.Qs and self.restart:  # à ajuster quand on gérera les obstacles dynamiques
+                if xnear not in self.Qs and self.restart:
                     self.Qs.append(xnear)
             self.rewire_radius = xs.ci
 
