@@ -10,15 +10,6 @@ from constants import alpha, beta, kmax, rs, vFree, edge, rg
 from math import pi
 
 
-def reduce_distance_to_rs(x0, x1):
-    coordinatesX1 = np.array([x1.x, x1.y, x1.z])
-    coordinatesX0 = np.array([x0.x, x0.y, x0.z])
-
-    coordinatesNewX = (coordinatesX1 - coordinatesX0) / norme(x1, x0) * rs + coordinatesX0
-    newX = Noeud(coordinatesNewX[0], coordinatesNewX[1], coordinatesNewX[2])
-    return newX
-
-
 class Tree:
     def __init__(self, noeuds=None, xa=Noeud(), xgoal=Noeud()):
         if noeuds is None:
@@ -44,13 +35,10 @@ class Tree:
         IsGoalReached, xclose = self.goal_reached()
 
         if Pr > 1 - alpha:
-            x1 = np.array([xclose.x, xclose.y, xclose.z])
-            goal = np.array([xgoal.x, xgoal.y, xgoal.z])
-
-            return line_sampling(x1, goal)
+            return line_sampling(xclose, xgoal)
 
         elif Pr <= (1 - alpha) / beta or not IsGoalReached:
-            return uniform_sampling()
+            return uniform_sampling(self)
 
         else:
             cmin = norme(xo, xgoal)
@@ -119,6 +107,9 @@ class Tree:
 
         for xnear in Xnear:
 
+            if norme(xnew, xnear) > rs:
+                continue
+
             cnew = xnear.ci + norme(xnear, xnew)
 
             if cnew < cmin and xnear.line(xnew):
@@ -138,6 +129,10 @@ class Tree:
             Xnear = self.find_nodes_near(xr)
 
             for xnear in Xnear:
+
+                if norme(xr, xnear) > rs:
+                    continue
+
                 cold = xnear.ci
                 cnew = xr.ci + norme(xr, xnear)
 
@@ -161,6 +156,9 @@ class Tree:
             Xnear = self.find_nodes_near(xs)
 
             for xnear in Xnear:
+
+                if norme(xs, xnear) > rs:
+                    continue
 
                 cold = xnear.ci
                 cnew = xnear.ci + norme(xs, xnear)

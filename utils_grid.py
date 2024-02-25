@@ -38,7 +38,7 @@ def cells():
     if ry: nbCellsy += 1
     if rz: nbCellsz += 1
 
-    return [[[[] for _ in range(nbCellsz)] for _ in range(nbCellsy)] for _ in range(nbCellsx)]
+    return [[[[] for _ in range(int(nbCellsz))] for _ in range(int(nbCellsy))] for _ in range(int(nbCellsx))]
 
 
 def list_indices_at_range(r):

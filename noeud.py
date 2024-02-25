@@ -90,7 +90,7 @@ class Noeud:
 
     def line(self, other):
         dist = norme(self, other)
-        numb_try = int(dist // l_min)
+        numb_try = int(dist)
 
         coord1 = np.array([self.x, self.y, self.z])
         coord2 = np.array([other.x, other.y, other.z])
@@ -100,6 +100,4 @@ class Noeud:
             coord_on_line = coord1 + i * coord_unitaire
             if not inGrid(Noeud(coord_on_line[0], coord_on_line[1], coord_on_line[2])):
                 return False
-            else:
-                pass
         return True

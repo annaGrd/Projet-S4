@@ -3,7 +3,7 @@ from noeud import Noeud
 from time import time
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from constants import Xobs
+from constants import Xobs, X
 from utils_grid import norme
 
 animate = True
@@ -18,15 +18,16 @@ linkListByFrame = []
 QrByFrame = []
 QsByFrame = []
 endTrajByFrame = []
+xaByFrame = []
 
 
 def update_fig(i):
     artists = []
     ax.clear()
 
-    ax.set_xlim3d([0, 100])
-    ax.set_ylim3d([0, 100])
-    ax.set_zlim3d([0, 100])
+    ax.set_xlim3d([X[0][0], X[0][1]])
+    ax.set_ylim3d([X[1][0], X[1][1]])
+    ax.set_zlim3d([X[2][0], X[2][1]])
 
     for xobs in Xobs:
         for x in [[xobs[0][0], xobs[0][0]], [xobs[0][1], xobs[0][0]], [xobs[0][1], xobs[0][1]]]:
@@ -41,7 +42,7 @@ def update_fig(i):
             color = "blue"
         if node in QrByFrame[i]:
             color = "yellow"
-        if node == xa:
+        if node == xaByFrame[i]:
             color = "red"
         if node == endTrajByFrame[i]:
             color = "green"
@@ -59,7 +60,7 @@ def update_fig(i):
 
 xa = Noeud()
 xa.ci = 0
-xgoal = Noeud(50, 50, 0)
+xgoal = Noeud(10, 20, 0)
 
 T = Tree([xa], xa, xgoal)
 T.add_node_to_cell(xa)
@@ -69,12 +70,19 @@ t1 = time()
 i = 0
 while time() - t1 < .5:
     i += 1
+
+    """if time() - t1 > .25:
+        xa = T.Vt[17]
+        T.xa = xa
+        xa.ci = 0
+        xa.recalculate_child_costs()"""
+
     t = time()
     T.expansion_and_rewiring()
     print(i, time() - t)
 
     endTraj = T.closest_node(T.xgoal)
-    print(endTraj.x, endTraj.y, endTraj.z, endTraj.ci)
+    print(endTraj.x, endTraj.y, endTraj.z, endTraj.ci, norme(endTraj, xgoal))
     print(norme(xa, xgoal))
     print("")
 
@@ -84,6 +92,7 @@ while time() - t1 < .5:
         QsByFrame.append(list(T.Qs))
         QrByFrame.append(list(T.Qr))
         endTrajByFrame.append(endTraj)
+        xaByFrame.append(xa)
 
 if animate:
     anim = animation.FuncAnimation(fig, update_fig, i)

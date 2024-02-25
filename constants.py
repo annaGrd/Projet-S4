@@ -1,7 +1,7 @@
 import numpy as np
 
 # Généralités
-X = np.array([[0, 100], [0, 100], [0, 100]])  # faire choisir une taille de grille
+X = np.array([[0, 30], [0, 30], [0, 30]])  # faire choisir une taille de grille
 
 Xobs = np.array([])  # à compléter
 vObs = 0
@@ -19,12 +19,12 @@ vFree = vTot - vObs
 
 # Algo 1
 rprox = 5  # arbitraire, algo 1
-edge = 10  # arbitraire, taille d'une case, choisir en fonction de la taille des objets dynamiques
+edge = 2  # arbitraire, taille d'une case, choisir en fonction de la taille des objets dynamiques
 
 # Algo 2
 kmax = 5  # arbitraire
 rs = 5  # arbitraire
-alpha = 0.1  # arbitraire
+alpha = .5  # arbitraire
 beta = 2  # arbitraire
 
 update_time = 10  # arbitraire, durée entre deux updates
