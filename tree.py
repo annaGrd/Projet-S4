@@ -20,7 +20,7 @@ class Tree:
         self.Qr = list()
         self.traj = list()
         self.xa = xa  # position du drone
-        self.root = xa  # racice de l'arbre
+        self.root = xa  # racine de l'arbre
         self.xgoal = xgoal  # point d'arrivée
         self.cell = cells()
         self.nbcellx = len(self.cell)
