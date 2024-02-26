@@ -22,7 +22,6 @@ class Noeud:
             return False
 
     def parent(self):
-
         for voisin in self.voisins:
 
             if voisin.ci < self.ci:
@@ -51,7 +50,10 @@ class Noeud:
                 x.recalculate_child_costs()
 
     def fc(self, xgoal):
-
+        """
+        Fonction de pondération pour déterminer le meilleur enfant en contournant les blocages
+        dans des minimas locaux.
+        """
         if self.already_seen:
             return inf
 
@@ -59,7 +61,9 @@ class Noeud:
             return self.ci + norme(self, xgoal)
 
     def bestChild(self, xgoal):
-
+        """
+        Détermine l'enfant le plus pertinent pour notre prévision de trajectoire
+        """
         pa = self.parent()
         v = [x for x in self.voisins if (pa is None or x != pa)]
         fcs = [x.fc(xgoal) for x in v]
@@ -76,6 +80,9 @@ class Noeud:
         return best_child
 
     def line(self, other):
+        """
+        Indique si l'on peut tracer une arête entre deux noeuds
+        """
         dist = norme(self, other)
         numb_try = int(dist)
 
@@ -91,7 +98,7 @@ class Noeud:
 
     def unblock(self):
         """
-        Debloque le noeuds ainsi que ses ancetres (utilise quand on ajoute une node ou qu'on rewire)
+        Débloque le noeuds ainsi que ses ancêtres (utilise quand on ajoute une node ou qu'on rewire)
         """
         self.already_seen = False
         pa = self.parent()

@@ -20,16 +20,19 @@ class Tree:
         self.Qr = list()
         self.traj = list()
         self.xa = xa  # position du drone
-        self.root = xa  # racince de l'arbre
-        self.xgoal = xgoal  # faire choisir un point d'arrivée
+        self.root = xa  # racice de l'arbre
+        self.xgoal = xgoal  # point d'arrivée
         self.cell = cells()
         self.nbcellx = len(self.cell)
         self.nbcelly = len(self.cell[0])
         self.nbcellz = len(self.cell[0][0])
-        self.restart = False
-        self.rewire_radius = .0
+        self.restart = False  # condition pour algo 6
+        self.rewire_radius = .0  # condition pour reset de Qs
 
     def rand_node(self):
+        """
+        Random sampling de x
+        """
         xgoal = self.xgoal
         xo = self.root
         Pr = uniform(0, 1)
@@ -43,7 +46,7 @@ class Tree:
 
         else:
             cmin = norme(xo, xgoal)
-            cbest = xclose.ci  # est-ce bien la distance entre xo et xgoal, pas sur
+            cbest = xclose.ci
             a = cbest / 2
             b = (cbest ** 2 + cmin ** 2) ** 0.5 / 2
 
@@ -84,7 +87,7 @@ class Tree:
         return minimumArg
 
     def expansion_and_rewiring(self):
-
+        # Algo 2
         xrand = self.rand_node()
 
         xclosest = self.closest_node(xrand)
@@ -103,6 +106,7 @@ class Tree:
         self.rewire_from_root()
 
     def add_node(self, xnew, xclosest, Xnear):
+        # Algo 3
         xmin = xclosest
         cmin = xclosest.ci + norme(xclosest, xnew)
 
@@ -124,6 +128,7 @@ class Tree:
         xnew.unblock()
 
     def rewire_random_node(self):
+        # Algo 4
         t = time()
         while t - time() < .01 and len(self.Qr) > 0:  # Temps arbitraire
 
@@ -148,7 +153,7 @@ class Tree:
                     self.Qr.append(xnear)
 
     def rewire_from_root(self):
-
+        # Algo 5
         if not self.Qs:
             self.Qs.append(self.root)
 
@@ -177,9 +182,11 @@ class Tree:
             self.rewire_radius = xs.ci
 
     def find_nodes_near(self, x):
+        """
+        Crée Xnear
+        """
         Xsi = self.mkeXsi(x)
-        epsilon = vFree ** (1/3) * ((3*kmax)/(4*pi*len(self.Vt))) ** (1/3)  # Maintenant qu'on est en 3D, mu(B_epsilon) = 4/3*pi*epsilon**3
-        # vFree est sorti de la racine principale pour éviter les overflow errors
+        epsilon = vFree ** (1/3) * ((3*kmax)/(4*pi*len(self.Vt))) ** (1/3)  # 3D -> mu(B_epsilon) = 4/3*pi*epsilon**3
         if epsilon < rs: epsilon = rs
 
         Xnear = []
@@ -204,14 +211,10 @@ class Tree:
         radius = 0
         extraRadius = 0
         empty = True
-        while extraRadius <= 2 and radius <= max(self.nbcellx, self.nbcelly, self.nbcellz): # Nombre arbitraire, designe le nombre de couches supplementaires a prendre en compte apres avoir trouve une node
+        while extraRadius <= 2 and radius <= max(self.nbcellx, self.nbcelly, self.nbcellz): # Désigne le nombre de couches supplémentaires à considérer trouver une node
             radius += 1
             gap = list_indices_at_range(radius)
             for abscissa, ordinate, altitude in gap:
-                """j'aimerais mettre une condition du type si l'indice n'est pas dans
-                la liste, on ignore et on passe à la suite. N'étant point accoutumée 
-                à l'usage des try and except, je t'invite à check si c'est correct"""
-
                 if not (0 <= qx + abscissa < self.nbcellx and 0 <= qy + ordinate < self.nbcelly and 0 <= qz + altitude < self.nbcellz): continue
 
                 cell = self.cell[qx + abscissa][qy + ordinate][qz + altitude]
@@ -238,7 +241,10 @@ class Tree:
         return norme(self.xgoal, xclose) < rg and xclose.line(self.xgoal), xclose
 
     def deadEnd(self, x):
-
+        """
+        Indique si x est une extrémité actuellement.
+        x peut-être une feuille ou ses enfants peuvent être bloqués.
+        """
         if len(x.voisins) < 2 and x != self.root:  # si n'a qu'un voisin (juste son parent)
             return True
 
@@ -252,6 +258,7 @@ class Tree:
         return True  # tous les enfants ont déjà été vus
 
     def plan(self):
+        # Algo 6
         if self.goal_reached()[0]:
             xclosest = self.closest_node(self.xgoal)
             path = [xclosest]
@@ -259,8 +266,6 @@ class Tree:
                 xclosest = xclosest.parent()
                 path.insert(0, xclosest)
             self.traj = path[1:]
-            # chemin toujours accessible ? check les ci et compare les arêtes
-
         else:
             path = [self.root]
             while not self.deadEnd(path[-1]) and len(path) < k:
@@ -268,15 +273,14 @@ class Tree:
 
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
-                self.traj = path  # l.11
+                self.traj = path
                 return self, True
             return self, False
 
     def path_exists(self, path):
         """
-        Verifie que le chemin existe toujours
+        Vérifie que le chemin existe toujours
         """
-
         for idx in range(len(path) - 1):
             if (path[idx], path[idx + 1]) not in self.Et and (path[idx + 1], path[idx]) not in self.Et:
                 return False

@@ -7,17 +7,16 @@ from constants import X, rs
 
 
 def ellipsoid(x, y, z, a, b):
-
     return (x**2 + y**2) / b**2 + z**2 / a**2 <= 1
 
 
 def ellipse_sampling(root, goal, a, b):
-    # recherche coordonnées, on peut le faire dès le début non ?
+    """
+    Renvoie des coordonnées aléatoires dans une ellipsoïde paramétrée autour de xo et xgoal
+    """
     x = uniform(-b, b)
     y = uniform(-b, b)
     z = uniform(-a, a)
-    """c'est la merde, comment je teste que c'est dans la grille ?.
-    Pour le moment, je le fais plus tard mais un peu contre-productif."""
     while not ellipsoid(x, y, z, a, b):
         x = uniform(-b, b)
         y = uniform(-b, b)
@@ -33,6 +32,9 @@ def ellipse_sampling(root, goal, a, b):
 
 
 def reduce_distance_to_rs(x0, x1):
+    """
+    Retourne des coordonnées pour que le nœud soit au maximum à une distance rs du noeud le plus proche
+    """
     coordinatesX1 = np.array([x1.x, x1.y, x1.z])
     coordinatesX0 = np.array([x0.x, x0.y, x0.z])
 
@@ -42,7 +44,9 @@ def reduce_distance_to_rs(x0, x1):
 
 
 def line_sampling(xclose, xgoal):
-
+    """
+    Retourne un point aléatoire sur le segment entre xclose et xgoal
+    """
     x1 = np.array([xclose.x, xclose.y, xclose.z])
     goal = np.array([xgoal.x, xgoal.y, xgoal.z])
 
@@ -59,6 +63,9 @@ def line_sampling(xclose, xgoal):
 
 
 def uniform_sampling(T):
+    """
+    Retourne des coordonnées aléatoires dans la grille
+    """
     x = uniform(X[0][0], X[0][1])
     y = uniform(X[1][0], X[1][1])
     z = uniform(X[2][0], X[2][1])

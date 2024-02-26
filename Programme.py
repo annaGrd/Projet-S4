@@ -7,11 +7,11 @@ from utils_grid import norme
 
 
 def main(xa, Xobs, xgoal):
-
-    T = Tree([xa], Noeud(), Noeud())  # définir xa et xgoal
+    # Algo 1
+    T = Tree([xa], Noeud(), Noeud())
     t = time()
 
-    while norme(T.xa, T.xgoal) > rprox:  # ? le drone proche de xgoal, à modifier en dynamique
+    while norme(T.xa, T.xgoal) > rprox:  # à modifier en dynamique
         _, change_xgoal = update(T)
         if change_xgoal:
             for x in T.Vt:
@@ -27,4 +27,3 @@ def main(xa, Xobs, xgoal):
             T.restart = True
             T.Qs = list()
         # envoyer la traj au drone, il va vers xo si moving == True
-    return  # ?

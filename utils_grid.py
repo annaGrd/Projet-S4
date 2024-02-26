@@ -9,7 +9,9 @@ def norme(x1, x2):
 
 
 def inGrid(n):
-
+    """
+    Indique si le noeud est sur un espace libre de la grille
+    """
     if n.x > X[0][1] or n.y > X[1][1] or n.z > X[2][1] or n.x < X[0][0] or n.y < X[1][0] or n.z < X[2][0]:
         return False
 
@@ -20,13 +22,11 @@ def inGrid(n):
     return True
 
 
-"""            break
-    else:
-        return True
-    return False """
-
-
 def cells():
+    """
+    Création d'une grille dont chaque case contient les noeuds présents
+    dans une portion de l'espace
+    """
     lx = X[0][1]  # lg selon x
     ly = X[1][1]  # lg selon y
     lz = X[2][1]  # lg selon z
@@ -42,6 +42,10 @@ def cells():
 
 
 def list_indices_at_range(r):
+    """
+    Pour une case de coordonnées [0, 0, 0],
+    Donne la liste des cases voisines
+    """
     listIndices = []
 
     for x in (r, -r):
