@@ -40,7 +40,7 @@ def main(xa, Xobs, xgoal):
         # envoyer la traj au drone, il va vers xo si moving == True
         # code de test
         velocity = 1
-        if len(T.traj) > 1:
+        if len(T.traj) > 1 and moving:
             coordinatesXa = np.array([T.xa.x, T.xa.y, T.xa.z])
             coordinatesX1 = np.array([T.traj[1].x, T.traj[1].y, T.traj[1].z])
             coordinatesNewXa = (coordinatesX1 - coordinatesXa) / norme(T.xa, T.traj[1]) * velocity + coordinatesXa

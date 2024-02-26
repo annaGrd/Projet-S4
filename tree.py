@@ -269,6 +269,7 @@ class Tree:
 
         if self.xa.line(self.xgoal):
             self.traj = [self.root, self.xgoal]
+            return True
 
         elif self.goal_reached()[0]:
             xclosest = self.closest_node(self.xgoal)
@@ -277,6 +278,7 @@ class Tree:
                 xclosest = xclosest.parent()
                 path.insert(0, xclosest)
             self.traj = path[1:]
+            return True
         else:
             path = [self.root]
             while not self.deadEnd(path[-1]) and len(path) < k:
@@ -285,8 +287,10 @@ class Tree:
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
                 self.traj = path
-                return True
-            return False
+
+            if norme(self.traj[-1], self.xgoal) > norme(self.xa, self.xgoal):
+                return False
+            return True
 
     def path_exists(self, path):
         """
