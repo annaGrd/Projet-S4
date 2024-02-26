@@ -51,13 +51,9 @@ class Tree:
 
         else:
             cmin = norme(xo, xgoal)
-            cbest = xclose.ci
+            cbest = xclose.fc(xgoal)  # Le fc evite le cas où le noeud le plus proche est la racine ie xclose.ci = 0
             a = cbest / 2
             b = (cbest ** 2 + cmin ** 2) ** 0.5 / 2
-
-            # Si jamais l'agent est trop proche du goal, on aura a == 0, donc on ne pourra pas faire d'ellipse
-            if a == 0 or b == 0:
-                return line_sampling(xclose, xgoal)
 
             root = np.array([xo.x, xo.y, xo.z])
             goal = np.array([xgoal.x, xgoal.y, xgoal.z])
@@ -270,7 +266,11 @@ class Tree:
 
     def plan(self):
         # Algo 6
-        if self.goal_reached()[0]:
+
+        if self.xa.line(self.xgoal):
+            self.traj = [self.root, self.xgoal]
+
+        elif self.goal_reached()[0]:
             xclosest = self.closest_node(self.xgoal)
             path = [xclosest]
             while xclosest is not None:
