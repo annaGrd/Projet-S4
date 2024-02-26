@@ -287,6 +287,7 @@ class Tree:
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
                 self.traj = path
+                self.opti_traj(0, [])
 
             if norme(self.traj[-1], self.xgoal) > norme(self.xa, self.xgoal):
                 return False
@@ -301,3 +302,28 @@ class Tree:
                 return False
 
         return True
+
+    def opti_traj(self, rg_end, new_traj):
+        # rg_end est le rang du noeud end du précédent opti_traj
+        if self.traj[-1] == self.traj[rg_end]:  # si cette condition est vraie, c'est qu'on a tracé une ligne avec le dernier point de la traj en temps qu'extrémité finale
+            new_traj.append(self.traj[-1])  # on n'ajoute donc pas l'avant-dernier car il est sauté par la nouvelle arête
+            self.traj = new_traj
+            return None
+
+        else:
+            for i in range(rg_end, len(self.traj)-2):  # ne sert à rien de traiter les deux derniers en temps qu'extrémité de début
+                """ On fait une itération inutile si opti_traj est appelée par récursion, 
+                mais pas grave. Essayer de ne pas faire cette itération, c'est la merde"""
+                start = self.traj[i]
+                new_traj.append(start)
+                for j in range(len(self.traj)-1,i+1,-1):  # ne sert à rien de traiter start et son enfant en temps qu'extrémité de fin
+                    end = self.traj[j]
+                    if start.line(end):
+                        self.remove_link(end, end.parent())
+                        self.add_link(start, end)
+                        start.recalculate_child_costs()
+                        self.opti_traj(j, new_traj)
+            new_traj.append(self.traj[-2])
+            new_traj.append(self.traj[-1])
+            self.traj = new_traj
+            return None
