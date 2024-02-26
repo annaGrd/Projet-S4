@@ -21,24 +21,14 @@ class Noeud:
         else:
             return False
 
-    def parent(self, xo):
-
-        # si on demande le parent de la racine
-        if self == xo:
-            return None
-
-        # prendre celui avec le ci plus petit que self
-
-        pa = self.voisins[0]
-        cmin = pa.ci
+    def parent(self):
 
         for voisin in self.voisins:
 
-            if voisin.ci < cmin:
-                pa = voisin
-                cmin = pa.ci
+            if voisin.ci < self.ci:
+                return voisin
 
-        return pa
+        return None
 
     def recalculate_child_costs(self):
 
@@ -70,7 +60,7 @@ class Noeud:
 
     def bestChild(self, xo, xgoal):
 
-        pa = self.parent(xo)
+        pa = self.parent()
         v = [x for x in self.voisins if (pa is None or x != pa)]
         fcs = [x.fc(xgoal) for x in v]
 
@@ -99,11 +89,11 @@ class Noeud:
                 return False
         return True
 
-    def unblock(self, xo):
+    def unblock(self):
         """
         Debloque le noeuds ainsi que ses ancetres (utilise quand on ajoute une node ou qu'on rewire)
         """
         self.already_seen = False
-        pa = self.parent(xo)
+        pa = self.parent()
         if pa is not None:
-            pa.unblock(xo)
+            pa.unblock()
