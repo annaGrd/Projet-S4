@@ -58,7 +58,7 @@ class Noeud:
         else:
             return self.ci + norme(self, xgoal)
 
-    def bestChild(self, xo, xgoal):
+    def bestChild(self, xgoal):
 
         pa = self.parent()
         v = [x for x in self.voisins if (pa is None or x != pa)]

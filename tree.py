@@ -263,7 +263,7 @@ class Tree:
         else:
             path = [self.traj[0]]
             while not self.deadEnd(path[-1]) and len(path) < k:
-                path.append(path[-1].bestChild(self.traj[0], self.xgoal))
+                path.append(path[-1].bestChild(self.xgoal))
 
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
