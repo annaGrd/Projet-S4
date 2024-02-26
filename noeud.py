@@ -1,7 +1,6 @@
 import numpy as np
 from math import inf
 
-from constants import l_min
 from utils_grid import norme, inGrid
 
 
