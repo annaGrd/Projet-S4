@@ -32,20 +32,6 @@ def ellipse_sampling(root, goal, a, b):
     return newNode
 
 
-def line_sampling(xclose, xgoal):
-
-    x1 = np.array([xclose.x, xclose.y, xclose.z])
-    goal = np.array([xgoal.x, xgoal.y, xgoal.z])
-
-    r = uniform(0, rs/norme(xclose, xgoal))
-    new = (1-r) * x1 + r * goal
-    newNode = Noeud(new[0], new[1], new[2])
-
-    if not inGrid(newNode): return line_sampling(xclose, xgoal)
-
-    return newNode
-
-
 def reduce_distance_to_rs(x0, x1):
     coordinatesX1 = np.array([x1.x, x1.y, x1.z])
     coordinatesX0 = np.array([x0.x, x0.y, x0.z])
@@ -53,6 +39,23 @@ def reduce_distance_to_rs(x0, x1):
     coordinatesNewX = (coordinatesX1 - coordinatesX0) / norme(x1, x0) * rs + coordinatesX0
     newX = Noeud(coordinatesNewX[0], coordinatesNewX[1], coordinatesNewX[2])
     return newX
+
+
+def line_sampling(xclose, xgoal):
+
+    x1 = np.array([xclose.x, xclose.y, xclose.z])
+    goal = np.array([xgoal.x, xgoal.y, xgoal.z])
+
+    r = uniform(0, 1)
+    new = (1-r) * x1 + r * goal
+    newNode = Noeud(new[0], new[1], new[2])
+
+    if norme(newNode, xclose) > rs:
+        newNode = reduce_distance_to_rs(xclose, newNode)
+
+    if not inGrid(newNode): return line_sampling(xclose, xgoal)
+
+    return newNode
 
 
 def uniform_sampling(T):

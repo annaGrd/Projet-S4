@@ -34,7 +34,7 @@ class Tree:
         Pr = uniform(0, 1)
         IsGoalReached, xclose = self.goal_reached()
 
-        if Pr > 1 - alpha:
+        if Pr > 1 - alpha and not IsGoalReached and xclose.line(xgoal):
             return line_sampling(xclose, xgoal)
 
         elif Pr <= (1 - alpha) / beta or not IsGoalReached:
@@ -42,7 +42,7 @@ class Tree:
 
         else:
             cmin = norme(xo, xgoal)
-            cbest = xclose.ci  # est-ce bien la distance entre xo et xgoal, pas sur
+            cbest = xclose.fc(xgoal)  # est-ce bien la distance entre xo et xgoal, pas sur
             a = cbest / 2
             b = (cbest ** 2 + cmin ** 2) ** 0.5 / 2
 
@@ -130,9 +130,6 @@ class Tree:
 
             for xnear in Xnear:
 
-                if norme(xr, xnear) > rs:
-                    continue
-
                 cold = xnear.ci
                 cnew = xr.ci + norme(xr, xnear)
 
@@ -156,9 +153,6 @@ class Tree:
             Xnear = self.find_nodes_near(xs)
 
             for xnear in Xnear:
-
-                if norme(xs, xnear) > rs:
-                    continue
 
                 cold = xnear.ci
                 cnew = xnear.ci + norme(xs, xnear)

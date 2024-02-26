@@ -6,8 +6,8 @@ import matplotlib.animation as animation
 from constants import Xobs, X
 from utils_grid import norme
 
-animate = True
-render = True
+animate = False  # Anime tout le procede de l'algo
+render = True  # Affiche les obstacles, la trajectoire trouvee le point de depart et le point d'arrivee
 
 fig = plt.figure()
 ax = fig.add_subplot(projection="3d")
@@ -60,15 +60,15 @@ def update_fig(i):
 
 xa = Noeud()
 xa.ci = 0
-xgoal = Noeud(10, 20, 0)
+xgoal = Noeud(30, 30, 20)
 
 T = Tree([xa], xa, xgoal)
 T.add_node_to_cell(xa)
 T.traj = [xa]
 
-t1 = time()
+timeSpent = 0
 i = 0
-while time() - t1 < .5:
+while timeSpent < 5:
     i += 1
 
     """if time() - t1 > .25:
@@ -79,11 +79,13 @@ while time() - t1 < .5:
 
     t = time()
     T.expansion_and_rewiring()
+    timeSpent += time() - t
     print(i, time() - t)
 
     endTraj = T.closest_node(T.xgoal)
     print(endTraj.x, endTraj.y, endTraj.z, endTraj.ci, norme(endTraj, xgoal))
     print(norme(xa, xgoal))
+    print(len(T.Vt))
     print("")
 
     if animate or render:
@@ -99,4 +101,25 @@ if animate:
     plt.show()
 
 if render:
-    update_fig(i-1)
+
+    ax.set_xlim3d([X[0][0], X[0][1]])
+    ax.set_ylim3d([X[1][0], X[1][1]])
+    ax.set_zlim3d([X[2][0], X[2][1]])
+
+    endTrajPath = endTrajByFrame[-1]
+    ax.scatter(endTrajPath.x, endTrajPath.y, endTrajPath.z, color="green")
+    while endTrajPath.parent(xa) is not None:
+        pa = endTrajPath.parent(xa)
+        ax.scatter(pa.x, pa.y, pa.z, color="blue")
+        ax.plot([endTrajPath.x, pa.x], [endTrajPath.y, pa.y], [endTrajPath.z, pa.z], color="blue")
+        endTrajPath = pa
+
+    for xobs in Xobs:
+        for x in [[xobs[0][0], xobs[0][0]], [xobs[0][1], xobs[0][0]], [xobs[0][1], xobs[0][1]]]:
+            for y in [[xobs[1][0], xobs[1][0]], [xobs[1][1], xobs[1][0]], [xobs[1][1], xobs[1][1]]]:
+                for z in [[xobs[2][0], xobs[2][0]], [xobs[2][1], xobs[2][0]], [xobs[2][1], xobs[2][1]]]:
+                    ax.plot(x, y, z, color="red")
+
+    ax.scatter(xgoal.x, xgoal.y, xgoal.z, color="purple")
+
+    plt.show()
