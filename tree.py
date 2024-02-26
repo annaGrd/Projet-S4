@@ -6,7 +6,7 @@ from random import uniform
 import numpy as np
 from random_sampling import ellipse_sampling, uniform_sampling, line_sampling
 from utils_grid import norme, cells, list_indices_at_range
-from constants import alpha, beta, kmax, rs, vFree, edge, rg
+from constants import alpha, beta, kmax, rs, vFree, edge, rg, k
 from math import pi
 
 
@@ -120,6 +120,7 @@ class Tree:
         self.add_link(xnew, xmin)
         self.add_node_to_cell(xnew)
         xnew.ci = xmin.ci + norme(xmin, xnew)
+        xnew.unblock(self.xa)
 
     def rewire_random_node(self):
         t = time()
@@ -139,6 +140,9 @@ class Tree:
                     self.add_link(xr, xnear)
                     self.remove_link(xnear, pa)
                     xr.recalculate_child_costs()
+
+                    xr.unblock(self.xa)
+                    xnear.unblock(self.xa)
 
                     self.Qr.append(xnear)
 
@@ -163,6 +167,9 @@ class Tree:
                     self.add_link(xs, xnear)
                     self.remove_link(xnear, pa)
                     xs.recalculate_child_costs()
+
+                    xs.unblock(self.xa)
+                    xnear.unblock(self.xa)
 
                 if xnear not in self.Qs and self.restart:
                     self.Qs.append(xnear)
@@ -228,3 +235,49 @@ class Tree:
     def goal_reached(self):
         xclose = self.closest_node(self.xgoal)
         return norme(self.xgoal, xclose) < rg and xclose.line(self.xgoal), xclose
+
+    def deadEnd(self, x):
+
+        if len(x.voisins) < 2 and x != self.xa:  # si n'a qu'un voisin (juste son parent)
+            return True
+
+        pa = x.parent(self.traj[0])
+        for v in x.voisins:
+            if pa is not None and v == pa:
+                pass
+            elif not v.already_seen:  # si un enfant n'est pas déjà vu
+                return False
+
+        return True  # tous les enfants ont déjà été vus
+
+    def plan(self):
+        if self.goal_reached()[0]:
+            xclosest = self.closest_node(self.xgoal)
+            path = [xclosest]
+            while xclosest is not None:
+                xclosest = xclosest.parent(self.xa)
+                path.insert(0, xclosest)
+            self.traj = path[1:]
+            # chemin toujours accessible ? check les ci et compare les arêtes
+
+        else:
+            path = [self.traj[0]]
+            while not self.deadEnd(path[-1]) and len(path) < k:
+                path.append(path[-1].bestChild(self.traj[0], self.xgoal))
+
+            path[-1].already_seen = True
+            if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
+                self.traj = path  # l.11
+                return self, True
+            return self, False
+
+    def path_exists(self, path):
+        """
+        Verifie que le chemin existe toujours
+        """
+
+        for idx in range(len(path) - 1):
+            if (path[idx], path[idx + 1]) not in self.Et and (path[idx + 1], path[idx]) not in self.Et:
+                return False
+
+        return True

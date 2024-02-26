@@ -6,7 +6,7 @@ import matplotlib.animation as animation
 from constants import Xobs, X
 from utils_grid import norme
 
-animate = False  # Anime tout le procede de l'algo
+animate = True  # Anime tout le procede de l'algo
 render = True  # Affiche les obstacles, la trajectoire trouvee le point de depart et le point d'arrivee
 
 fig = plt.figure()
@@ -19,6 +19,7 @@ QrByFrame = []
 QsByFrame = []
 endTrajByFrame = []
 xaByFrame = []
+TrajByFrame = []
 
 
 def update_fig(i):
@@ -33,17 +34,19 @@ def update_fig(i):
         for x in [[xobs[0][0], xobs[0][0]], [xobs[0][1], xobs[0][0]], [xobs[0][1], xobs[0][1]]]:
             for y in [[xobs[1][0], xobs[1][0]], [xobs[1][1], xobs[1][0]], [xobs[1][1], xobs[1][1]]]:
                 for z in [[xobs[2][0], xobs[2][0]], [xobs[2][1], xobs[2][0]], [xobs[2][1], xobs[2][1]]]:
-                    artists.append(ax.plot(x, y, z, color="red"))
+                    artists.append(ax.plot(x, y, z, color="black"))
 
 
     for node in nodeListByFrame[i]:
         color = "black"
         if node in QsByFrame[i]:
             color = "blue"
-        if node in QrByFrame[i]:
+        if node.already_seen:
             color = "yellow"
-        if node == xaByFrame[i]:
+        if node in TrajByFrame[i]:
             color = "red"
+        if node == xaByFrame[i]:
+            color = "blue"
         if node == endTrajByFrame[i]:
             color = "green"
         artists.append(ax.scatter(node.x, node.y, node.z, color=color))
@@ -51,7 +54,10 @@ def update_fig(i):
     artists.append(ax.scatter(xgoal.x, xgoal.y, xgoal.z, color="purple"))
 
     for node1, node2 in linkListByFrame[i]:
-        artists.append(ax.plot([node1.x, node2.x], [node1.y, node2.y], [node1.z, node2.z], color="blue"))
+        color = "blue"
+        if node1 in TrajByFrame[i] and node2 in TrajByFrame[i]:
+            color = "red"
+        artists.append(ax.plot([node1.x, node2.x], [node1.y, node2.y], [node1.z, node2.z], color=color))
 
     if animate:
         return artists
@@ -68,7 +74,7 @@ T.traj = [xa]
 
 timeSpent = 0
 i = 0
-while timeSpent < 5:
+while timeSpent < .5:
     i += 1
 
     """if time() - t1 > .25:
@@ -86,6 +92,7 @@ while timeSpent < 5:
     print(endTraj.x, endTraj.y, endTraj.z, endTraj.ci, norme(endTraj, xgoal))
     print(norme(xa, xgoal))
     print(len(T.Vt))
+    T.plan()
     print("")
 
     if animate or render:
@@ -95,6 +102,7 @@ while timeSpent < 5:
         QrByFrame.append(list(T.Qr))
         endTrajByFrame.append(endTraj)
         xaByFrame.append(xa)
+        TrajByFrame.append(T.traj)
 
 if animate:
     anim = animation.FuncAnimation(fig, update_fig, i)

@@ -19,7 +19,7 @@ def main(xa, Xobs, xgoal):
         while time() - t < 100:  # Durée arbitraire
             T.expansion_and_rewiring()
 
-        T, moving = plan(T)
+        T, moving = T.plan()
         if norme(T.xa, T.traj[0]) <= rprox:  # Ou faire avec le ci de traj[0]
 
             T.traj.pop(0)
@@ -28,38 +28,3 @@ def main(xa, Xobs, xgoal):
             T.Qs = list()
         # envoyer la traj au drone, il va vers xo si moving == True
     return  # ?
-
-# Algo 6
-
-
-def deadEnd(T, x):
-    if len(x.voisins) < 2:  # si n'a qu'un voisin (juste son parent)
-        return True
-
-    else:
-        pa = x.parent(T.traj[0])
-
-        for v in x.voisins:
-            if v == pa: pass
-            elif not v.already_seen:  # si un enfant n'est pas déjà vu
-                return False
-
-        return True  # tous les enfants ont déjà été vus
-
-
-def plan(T):
-
-    if T.goal_reached():
-        T.traj[-1] = T.xgoal
-        # chemin toujours accessible ? check les ci et compare les arêtes
-
-    else:
-        path = [T.traj[0]]
-        while not deadEnd(T, path[-1]) and len(path) < k:
-
-            path.append(path[-1].bestChild(T.traj[0], T.xgoal))
-
-        path[-1].already_seen = True
-        T.traj = path  # l.11
-        if norme(T.xa, T.xgoal) < norme(T.traj[-1], T.xgoal): return T, True
-        return T, False

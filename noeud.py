@@ -70,9 +70,9 @@ class Noeud:
 
     def bestChild(self, xo, xgoal):
 
-        v = self.voisins
         pa = self.parent(xo)
-        fcs = [x.fc(xo, xgoal) for x in v if x != pa]
+        v = [x for x in self.voisins if (pa is None or x != pa)]
+        fcs = [x.fc(xgoal) for x in v]
 
         fc_min = fcs[0]
         best_child = v[0]
@@ -98,3 +98,12 @@ class Noeud:
             if not inGrid(Noeud(coord_on_line[0], coord_on_line[1], coord_on_line[2])):
                 return False
         return True
+
+    def unblock(self, xo):
+        """
+        Debloque le noeuds ainsi que ses ancetres (utilise quand on ajoute une node ou qu'on rewire)
+        """
+        self.already_seen = False
+        pa = self.parent(xo)
+        if pa is not None:
+            pa.unblock(xo)
