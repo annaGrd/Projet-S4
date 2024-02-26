@@ -18,7 +18,7 @@ class Tree:
         self.Vt = noeuds
         self.Qs = list()
         self.Qr = list()
-        self.traj = list()
+        self.traj = [xa]
         self.xa = xa  # position du drone
         self.root = xa  # racine de l'arbre
         self.xgoal = xgoal  # point d'arrivée
@@ -28,6 +28,11 @@ class Tree:
         self.nbcellz = len(self.cell[0][0])
         self.restart = False  # condition pour algo 6
         self.rewire_radius = .0  # condition pour reset de Qs
+
+        xa.ci = 0
+
+        for noeud in self.Vt:
+            self.add_node_to_cell(noeud)
 
     def rand_node(self):
         """
@@ -49,6 +54,10 @@ class Tree:
             cbest = xclose.ci
             a = cbest / 2
             b = (cbest ** 2 + cmin ** 2) ** 0.5 / 2
+
+            # Si jamais l'agent est trop proche du goal, on aura a == 0, donc on ne pourra pas faire d'ellipse
+            if a == 0 or b == 0:
+                return line_sampling(xclose, xgoal)
 
             root = np.array([xo.x, xo.y, xo.z])
             goal = np.array([xgoal.x, xgoal.y, xgoal.z])
@@ -144,7 +153,8 @@ class Tree:
                     pa = xnear.parent()
 
                     self.add_link(xr, xnear)
-                    self.remove_link(xnear, pa)
+                    if pa is not None:
+                        self.remove_link(xnear, pa)
                     xr.recalculate_child_costs()
 
                     xr.unblock()
@@ -158,7 +168,7 @@ class Tree:
             self.Qs.append(self.root)
 
         t = time()
-        while t - time() < .01 and self.Qs:
+        while time() - t < .1 and self.Qs:
             xs = self.Qs.pop(0)
             Xnear = self.find_nodes_near(xs)
 
@@ -171,7 +181,8 @@ class Tree:
                     pa = xnear.parent()
 
                     self.add_link(xs, xnear)
-                    self.remove_link(xnear, pa)
+                    if pa is not None:
+                        self.remove_link(xnear, pa)
                     xs.recalculate_child_costs()
 
                     xs.unblock()
@@ -274,8 +285,8 @@ class Tree:
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
                 self.traj = path
-                return self, True
-            return self, False
+                return True
+            return False
 
     def path_exists(self, path):
         """
