@@ -40,7 +40,7 @@ def update_block(T, obstacles):
 
     # il ne reste plus que les noeuds qui ne sont plus en range d'un obstacle
     for x in blocked:
-        pa = x.parent(T.traj[0])
+        pa = x.parent()
         if pa.ci < inf:  # si le parent n'était pas bloqué, on calcule le ci de notre nœud débloqué et de ses enfants
             x.ci = pa.ci + norme(x, pa)
             x.recalculate_child_costs()

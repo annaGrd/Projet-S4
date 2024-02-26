@@ -135,7 +135,7 @@ class Tree:
                 cnew = xr.ci + norme(xr, xnear)
 
                 if cnew < cold and xr.line(xnear):
-                    pa = xnear.parent(self.traj[0])
+                    pa = xnear.parent()
 
                     self.add_link(xr, xnear)
                     self.remove_link(xnear, pa)
@@ -162,7 +162,7 @@ class Tree:
                 cnew = xnear.ci + norme(xs, xnear)
 
                 if cnew < cold and xs.line(xnear):
-                    pa = xnear.parent(self.traj[0])
+                    pa = xnear.parent()
 
                     self.add_link(xs, xnear)
                     self.remove_link(xnear, pa)
@@ -241,7 +241,7 @@ class Tree:
         if len(x.voisins) < 2 and x != self.xa:  # si n'a qu'un voisin (juste son parent)
             return True
 
-        pa = x.parent(self.traj[0])
+        pa = x.parent()
         for v in x.voisins:
             if pa is not None and v == pa:
                 pass
@@ -255,7 +255,7 @@ class Tree:
             xclosest = self.closest_node(self.xgoal)
             path = [xclosest]
             while xclosest is not None:
-                xclosest = xclosest.parent(self.xa)
+                xclosest = xclosest.parent()
                 path.insert(0, xclosest)
             self.traj = path[1:]
             # chemin toujours accessible ? check les ci et compare les arêtes
