@@ -47,6 +47,8 @@ def update_block(T, obstacles):
 
         x.block = False
 
+    return None
+
 
 def calcul_inrange(T, obs):
     """Choix d'un rb adapté à la vitesse.
@@ -75,3 +77,22 @@ def calcul_inrange(T, obs):
         if norme(x, Noeud(obs[0], obs[1], obs[2])) > rb: node_inrange.remove(x)
 
     return node_inrange
+
+
+def update(T):
+    """Récupère xa, xgoal, les coordonnées des obstacles dynamiques,
+    met à jour l'arbre et les marqueurs block.
+    Retourne les changements"""
+    xa = Noeud(); xgoal = Noeud(); obstacles = list()  # en attendant
+
+    change_xa = True
+    if xa == T.xa: change_xa = False
+    T.xa = xa
+
+    change_xgoal = True
+    if xgoal == T.xgoal: change_xgoal = False
+    T.xgoal = xgoal
+
+    update_block(T, obstacles)
+
+    return change_xa, change_xgoal

@@ -1,4 +1,5 @@
 from time import time
+from dynamic import update
 from tree import Tree
 from noeud import Noeud
 from constants import rprox, k
@@ -11,8 +12,8 @@ def main(xa, Xobs, xgoal):
     t = time()
 
     while norme(T.xa, T.xgoal) > rprox:  # ? le drone proche de xgoal, à modifier en dynamique
-        # On récupère le xa du drone et l'évolution de l'environnement
-        if # xgoal has changed:
+        _, change_xgoal = update(T)
+        if change_xgoal:
             for x in T.Vt:
                 x.already_seen = False
         while time() - t < 100:  # Durée arbitraire

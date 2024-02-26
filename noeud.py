@@ -62,9 +62,6 @@ class Noeud:
 
     def fc(self, xgoal):
 
-        """ À modifier si on passe à un xgoal dynamique → je crois que la gestion
-        de self.ci qui passe à l'infini est déjà gérée par recalculate_child_costs,
-        donc, on n'a pas à changer fc, je crois"""
         if self.already_seen:
             return inf
 
