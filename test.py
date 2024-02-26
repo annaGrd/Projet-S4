@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from constants import Xobs, X
 from utils_grid import norme
+from random import randint
 
 animate = True  # Anime tout le procede de l'algo
 render = True  # Affiche les obstacles, la trajectoire trouvee le point de depart et le point d'arrivee
@@ -72,16 +73,23 @@ T = Tree([xa], xa, xgoal)
 T.add_node_to_cell(xa)
 T.traj = [xa]
 
+changed = False
+
 timeSpent = 0
 i = 0
 while timeSpent < .5:
     i += 1
 
-    """if time() - t1 > .25:
-        xa = T.Vt[17]
+    if timeSpent > .25 and not changed:
+        for node in T.Vt:
+            node.already_seen = False
+        T.traj = T.traj[1:]
+        xa = T.Vt[randint(0, len(T.Vt)-1)]
         T.xa = xa
+        T.root = xa
         xa.ci = 0
-        xa.recalculate_child_costs()"""
+        xa.recalculate_child_costs()
+        changed = True
 
     t = time()
     T.expansion_and_rewiring()

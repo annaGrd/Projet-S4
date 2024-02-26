@@ -20,6 +20,7 @@ class Tree:
         self.Qr = list()
         self.traj = list()
         self.xa = xa  # position du drone
+        self.root = xa  # racince de l'arbre
         self.xgoal = xgoal  # faire choisir un point d'arrivée
         self.cell = cells()
         self.nbcellx = len(self.cell)
@@ -30,7 +31,7 @@ class Tree:
 
     def rand_node(self):
         xgoal = self.xgoal
-        xo = self.traj[0]
+        xo = self.root
         Pr = uniform(0, 1)
         IsGoalReached, xclose = self.goal_reached()
 
@@ -149,7 +150,7 @@ class Tree:
     def rewire_from_root(self):
 
         if not self.Qs:
-            self.Qs.append(self.traj[0])
+            self.Qs.append(self.root)
 
         t = time()
         while t - time() < .01 and self.Qs:
@@ -238,7 +239,7 @@ class Tree:
 
     def deadEnd(self, x):
 
-        if len(x.voisins) < 2 and x != self.xa:  # si n'a qu'un voisin (juste son parent)
+        if len(x.voisins) < 2 and x != self.root:  # si n'a qu'un voisin (juste son parent)
             return True
 
         pa = x.parent()
@@ -261,7 +262,7 @@ class Tree:
             # chemin toujours accessible ? check les ci et compare les arêtes
 
         else:
-            path = [self.traj[0]]
+            path = [self.root]
             while not self.deadEnd(path[-1]) and len(path) < k:
                 path.append(path[-1].bestChild(self.xgoal))
 
