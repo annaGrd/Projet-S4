@@ -42,7 +42,7 @@ class Tree:
 
         else:
             cmin = norme(xo, xgoal)
-            cbest = xclose.fc(xgoal)  # est-ce bien la distance entre xo et xgoal, pas sur
+            cbest = xclose.ci  # est-ce bien la distance entre xo et xgoal, pas sur
             a = cbest / 2
             b = (cbest ** 2 + cmin ** 2) ** 0.5 / 2
 
