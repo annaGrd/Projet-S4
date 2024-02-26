@@ -18,7 +18,7 @@ class Tree:
         self.Vt = noeuds
         self.Qs = list()
         self.Qr = list()
-        self.traj = list()
+        self.traj = [xa]
         self.xa = xa  # position du drone
         self.root = xa  # racine de l'arbre
         self.xgoal = xgoal  # point d'arrivée
@@ -28,6 +28,11 @@ class Tree:
         self.nbcellz = len(self.cell[0][0])
         self.restart = False  # condition pour algo 6
         self.rewire_radius = .0  # condition pour reset de Qs
+
+        xa.ci = 0
+
+        for noeud in self.Vt:
+            self.add_node_to_cell(noeud)
 
     def rand_node(self):
         """
@@ -46,7 +51,7 @@ class Tree:
 
         else:
             cmin = norme(xo, xgoal)
-            cbest = xclose.ci
+            cbest = xclose.fc(xgoal)  # Le fc evite le cas où le noeud le plus proche est la racine ie xclose.ci = 0
             a = cbest / 2
             b = (cbest ** 2 + cmin ** 2) ** 0.5 / 2
 
@@ -144,7 +149,8 @@ class Tree:
                     pa = xnear.parent()
 
                     self.add_link(xr, xnear)
-                    self.remove_link(xnear, pa)
+                    if pa is not None:
+                        self.remove_link(xnear, pa)
                     xr.recalculate_child_costs()
 
                     xr.unblock()
@@ -158,7 +164,7 @@ class Tree:
             self.Qs.append(self.root)
 
         t = time()
-        while t - time() < .01 and self.Qs:
+        while time() - t < .1 and self.Qs:
             xs = self.Qs.pop(0)
             Xnear = self.find_nodes_near(xs)
 
@@ -171,7 +177,8 @@ class Tree:
                     pa = xnear.parent()
 
                     self.add_link(xs, xnear)
-                    self.remove_link(xnear, pa)
+                    if pa is not None:
+                        self.remove_link(xnear, pa)
                     xs.recalculate_child_costs()
 
                     xs.unblock()
@@ -259,13 +266,19 @@ class Tree:
 
     def plan(self):
         # Algo 6
-        if self.goal_reached()[0]:
+
+        if self.xa.line(self.xgoal):
+            self.traj = [self.root, self.xgoal]
+            return True
+
+        elif self.goal_reached()[0]:
             xclosest = self.closest_node(self.xgoal)
             path = [xclosest]
             while xclosest is not None:
                 xclosest = xclosest.parent()
                 path.insert(0, xclosest)
             self.traj = path[1:]
+            return True
         else:
             path = [self.root]
             while not self.deadEnd(path[-1]) and len(path) < k:
@@ -274,9 +287,10 @@ class Tree:
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
                 self.traj = path
-                self.opti_traj(0, [])
-                return self, True
-            return self, False
+
+            if norme(self.traj[-1], self.xgoal) > norme(self.xa, self.xgoal):
+                return False
+            return True
 
     def path_exists(self, path):
         """
@@ -287,28 +301,3 @@ class Tree:
                 return False
 
         return True
-
-    def opti_traj(self, rg_end, new_traj):
-        # rg_end est le rang du noeud end du précédent opti_traj
-        if self.traj[-1] == self.traj[rg_end]:  # si cette condition est vraie, c'est qu'on a tracé une ligne avec le dernier point de la traj en temps qu'extrémité finale
-            new_traj.append(self.traj[-1])  # on n'ajoute donc pas l'avant-dernier car il est sauté par la nouvelle arête
-            self.traj = new_traj
-            return None
-
-        else:
-            for i in range(rg_end, len(self.traj)-2):  # ne sert à rien de traiter les deux derniers en temps qu'extrémité de début
-                """ On fait une itération inutile si opti_traj est appelée par récursion, 
-                mais pas grave. Essayer de ne pas faire cette itération, c'est la merde"""
-                start = self.traj[i]
-                new_traj.append(start)
-                for j in range(len(self.traj)-1,i+1,-1):  # ne sert à rien de traiter start et son enfant en temps qu'extrémité de fin
-                    end = self.traj[j]
-                    if start.line(end):
-                        self.remove_link(end, end.parent())
-                        self.add_link(start, end)
-                        start.recalculate_child_costs()
-                        self.opti_traj(j, new_traj)
-            new_traj.append(self.traj[-2])
-            new_traj.append(self.traj[-1])
-            self.traj = new_traj
-            return None

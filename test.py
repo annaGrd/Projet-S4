@@ -71,16 +71,15 @@ xgoal = Noeud(30, 30, 20)
 
 T = Tree([xa], xa, xgoal)
 T.add_node_to_cell(xa)
-T.traj = [xa]
 
 changed = False
 
 timeSpent = 0
 i = 0
-while timeSpent < .5:
+while timeSpent < 1:
     i += 1
 
-    if timeSpent > .25 and not changed:
+    if timeSpent > .5 and not changed:
         for node in T.Vt:
             node.already_seen = False
         T.traj = T.traj[1:]
@@ -114,7 +113,7 @@ while timeSpent < .5:
 
 if animate:
     anim = animation.FuncAnimation(fig, update_fig, i)
-    plt.show()
+    anim.save("test.gif", fps=10)
 
 if render:
 
