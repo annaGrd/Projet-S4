@@ -26,6 +26,13 @@ def main(xa, Xobs):
             for x in T.Vt:
                 x.already_seen = False
 
+            potentialRoot = T.closest_node(T.xa)
+            if potentialRoot is not None:
+                T.root = potentialRoot  # Quand on change d'objectif, on prend comme racine le noeud le plus proche
+                T.root.ci = 0
+                T.root.recalculate_child_costs(change_of_root=True)
+                T.Qs = list()
+
             T.traj = [T.root]  # On reset le chemin à chaque chanqement d'objectif
 
         print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))

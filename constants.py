@@ -16,7 +16,7 @@ for obs in Xobs:
 vTot = X[0][1] * X[1][1] * X[2][1]
 vFree = vTot - vObs
 
-rprox = 3  # Algo 1
+rprox = 2  # Algo 1
 edge = 2  # Taille d'une case, à définir en fonction de la taille des objets dynamiques
 
 kmax = 5  # Nombre maximal de voisins
