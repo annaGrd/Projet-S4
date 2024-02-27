@@ -1,6 +1,9 @@
+from random import randint
+from time import time
+
 from noeud import Noeud
 from constants import update_time, safety_radius, edge, ro
-from utils_grid import list_indices_at_range, norme
+from utils_grid import list_indices_at_range, norme, inGrid
 from math import inf
 
 """
@@ -78,23 +81,27 @@ def calcul_inrange(T, obs):
 
     return node_inrange
 
+global timeBeforeChange
+timeBeforeChange = 0
+
+global xgoal
+xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
+while not inGrid(xgoal):
+    xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
 
 def update_goal_and_obstacles(T, t):
     """Récupère xa, xgoal, les coordonnées des obstacles dynamiques,
     met à jour l'arbre et les marqueurs block.
     Retourne les changements"""
-    if t < 20:
-        xgoal = Noeud(30, 30, 20)
-    elif 20 <= t < 40:
-        xgoal = Noeud(0, 0, 0)
-    elif 40 <= t < 60:
-        xgoal = Noeud(0, 30, 30)
-    elif 60 <= t < 80:
-        xgoal = Noeud(15, 0, 15)
-    elif 80 <= t < 100:
-        xgoal = Noeud(15, 30, 30)
-    elif 100 <= t < 120:
-        xgoal = Noeud(0, 0, 0)
+
+    global timeBeforeChange
+    global xgoal
+
+    if t - timeBeforeChange > 10:
+        xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
+        while not inGrid(xgoal):
+            xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
+        timeBeforeChange = t
 
 
     # obstacles = list() # en attendant

@@ -9,7 +9,7 @@ ax = fig.add_subplot(projection="3d")
 
 xa = Noeud()
 
-listDronePositions, listTraj = main(xa, [])
+listDronePositions, listTraj, listXgoal = main(xa, [])
 
 def update_fig(i):
     artists = []
@@ -31,6 +31,8 @@ def update_fig(i):
 
     for nodeTrajIdx in range(len(listTraj[i])-1):
         artists.append(ax.plot([listTraj[i][nodeTrajIdx].x, listTraj[i][nodeTrajIdx+1].x], [listTraj[i][nodeTrajIdx].y, listTraj[i][nodeTrajIdx+1].y], [listTraj[i][nodeTrajIdx].z, listTraj[i][nodeTrajIdx+1].z], color="red"))
+
+    artists.append(ax.scatter(listXgoal[i].x, listXgoal[i].y, listXgoal[i].z, color="purple"))
 
     return artists
 

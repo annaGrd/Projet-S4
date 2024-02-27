@@ -16,10 +16,11 @@ def main(xa, Xobs):
     # test
     listDronePositions = []
     listTraj = []
+    listXgoal = []
 
     beginExecutionTime = time()
 
-    while time() - beginExecutionTime < 120:  # à modifier en dynamique
+    while time() - beginExecutionTime < 300:  # à modifier en dynamique
         change_xgoal = update_goal_and_obstacles(T, time()-beginExecutionTime)
         if change_xgoal:
             print("Changement d'objectif")
@@ -38,7 +39,7 @@ def main(xa, Xobs):
         print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
 
         t = time()
-        while time() - t < 1:  # Durée arbitraire
+        while time() - t < .5:  # Durée arbitraire
             T.expansion_and_rewiring()
 
         moving = T.plan()
@@ -55,10 +56,11 @@ def main(xa, Xobs):
         if len(T.traj) > 1 and moving:
             coordinatesXa = np.array([T.xa.x, T.xa.y, T.xa.z])
             coordinatesX1 = np.array([T.traj[1].x, T.traj[1].y, T.traj[1].z])
-            coordinatesNewXa = (coordinatesX1 - coordinatesXa) / norme(T.xa, T.traj[1]) * velocity + coordinatesXa
+            coordinatesNewXa = (coordinatesX1 - coordinatesXa) / norme(T.xa, T.traj[1]) * min(velocity, norme(T.xa, T.traj[1])) + coordinatesXa
             T.xa = Noeud(coordinatesNewXa[0], coordinatesNewXa[1], coordinatesNewXa[2])
 
         listDronePositions.append(T.xa)
         listTraj.append(T.traj)
+        listXgoal.append(T.xgoal)
 
-    return listDronePositions, listTraj
+    return listDronePositions, listTraj, listXgoal

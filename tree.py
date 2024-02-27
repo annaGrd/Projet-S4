@@ -268,7 +268,6 @@ class Tree:
 
     def plan(self):
         # Algo 6
-        self.opti_traj(0, [], False)
         
         """if self.xa.line(self.xgoal):
             self.traj = [self.root, self.xgoal]
@@ -281,6 +280,7 @@ class Tree:
                 xclosest = xclosest.parent()
                 path.insert(0, xclosest)
             self.traj = path[1:]
+            self.opti_traj(0, [], False)
             return True
         else:
             path = [self.root]
@@ -290,6 +290,7 @@ class Tree:
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
                 self.traj = path
+                self.opti_traj(0, [], False)
 
             if norme(self.traj[-1], self.xgoal) > norme(self.xa, self.xgoal):
                 return False
