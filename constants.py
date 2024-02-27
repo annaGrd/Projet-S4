@@ -20,7 +20,7 @@ rprox = 2  # Algo 1
 edge = 2  # Taille d'une case, à définir en fonction de la taille des objets dynamiques
 
 kmax = 5  # Nombre maximal de voisins
-rs = 5  # Distance minimale entre deux noeuds
+rs = 3  # Distance minimale entre deux noeuds
 alpha = .1  # Constante pour le random sampling
 beta = 2  # Constante pour le random sampling
 

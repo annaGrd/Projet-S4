@@ -83,12 +83,19 @@ def update_goal_and_obstacles(T, t):
     """Récupère xa, xgoal, les coordonnées des obstacles dynamiques,
     met à jour l'arbre et les marqueurs block.
     Retourne les changements"""
-    if t < 30:
+    if t < 20:
         xgoal = Noeud(30, 30, 20)
-    elif 30 <= t < 60:
+    elif 20 <= t < 40:
         xgoal = Noeud(0, 0, 0)
-    else:
+    elif 40 <= t < 60:
         xgoal = Noeud(0, 30, 30)
+    elif 60 <= t < 80:
+        xgoal = Noeud(15, 0, 15)
+    elif 80 <= t < 100:
+        xgoal = Noeud(15, 30, 30)
+    elif 100 <= t < 120:
+        xgoal = Noeud(0, 0, 0)
+
 
     # obstacles = list() # en attendant
 

@@ -19,7 +19,7 @@ def main(xa, Xobs):
 
     beginExecutionTime = time()
 
-    while time() - beginExecutionTime < 90:  # à modifier en dynamique
+    while time() - beginExecutionTime < 120:  # à modifier en dynamique
         change_xgoal = update_goal_and_obstacles(T, time()-beginExecutionTime)
         if change_xgoal:
             print("Changement d'objectif")
@@ -38,7 +38,7 @@ def main(xa, Xobs):
         print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
 
         t = time()
-        while time() - t < 2:  # Durée arbitraire
+        while time() - t < 1:  # Durée arbitraire
             T.expansion_and_rewiring()
 
         moving = T.plan()
