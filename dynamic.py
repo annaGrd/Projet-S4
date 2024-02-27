@@ -79,20 +79,22 @@ def calcul_inrange(T, obs):
     return node_inrange
 
 
-def update(T):
+def update_goal_and_obstacles(T, t):
     """Récupère xa, xgoal, les coordonnées des obstacles dynamiques,
     met à jour l'arbre et les marqueurs block.
     Retourne les changements"""
-    xa = Noeud(); xgoal = Noeud(); obstacles = list()  # en attendant
+    if t < 30:
+        xgoal = Noeud(30, 30, 20)
+    elif 30 <= t < 60:
+        xgoal = Noeud(0, 0, 0)
+    else:
+        xgoal = Noeud(0, 30, 30)
 
-    change_xa = True
-    if xa == T.xa: change_xa = False
-    T.xa = xa
+    # obstacles = list() # en attendant
 
-    change_xgoal = True
-    if xgoal == T.xgoal: change_xgoal = False
+    change_xgoal = (xgoal != T.xgoal)
     T.xgoal = xgoal
 
-    update_block(T, obstacles)
+    #update_block(T, obstacles)
 
-    return change_xa, change_xgoal
+    return change_xgoal
