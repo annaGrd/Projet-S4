@@ -51,7 +51,7 @@ class Tree:
 
         else:
             cmin = norme(xo, xgoal)
-            cbest = xclose.fc(xgoal)  # Le fc evite le cas où le noeud le plus proche est la racine ie xclose.ci = 0
+            cbest = xclose.fc(xgoal)  # Le fc évite le cas où le noeud le plus proche est la racine ie xclose.ci = 0
             a = cbest / 2
             b = (cbest ** 2 + cmin ** 2) ** 0.5 / 2
 
@@ -289,7 +289,7 @@ class Tree:
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
                 self.traj = path
-                #self.opti_traj(0, [])
+                # self.opti_traj(0, [])
 
             if norme(self.traj[-1], self.xgoal) > norme(self.xa, self.xgoal):
                 return False
@@ -308,16 +308,16 @@ class Tree:
     def opti_traj(self, rg_end, new_traj, changed):
 
         # rg_end est le rang du noeud end du précédent opti_traj
-        if self.traj[-1] == self.traj[rg_end]:  # si cette condition est vraie, c'est qu'on a tracé une ligne avec le dernier point de la traj en temps qu'extrémité finale
-            new_traj.append(self.traj[-1])  # on n'ajoute donc pas l'avant-dernier car il est sauté par la nouvelle arête
+        if self.traj[-1] == self.traj[rg_end]:  # si cette condition est vraie, c'est qu'on a tracé une ligne avec le dernier point de la traj en tant qu'extrémité finale
+            new_traj.append(self.traj[-1])  # on n'ajoute donc pas l'avant-dernier, car il est sauté par la nouvelle arête
             return True
 
         else:
-            for i in range(rg_end, len(self.traj)-2):  # ne sert à rien de traiter les deux derniers en temps qu'extrémité de début
+            for i in range(rg_end, len(self.traj)-2):  # ne sert à rien de traiter les deux derniers en tant qu'extrémité de début
                 if not changed:
                     start = self.traj[i]
                     new_traj.append(start)
-                    for j in range(len(self.traj)-1, i+1, -1):  # ne sert à rien de traiter start et son enfant en temps qu'extrémité de fin
+                    for j in range(len(self.traj)-1, i+1, -1):  # ne sert à rien de traiter start et son enfant en tant qu'extrémité de fin
                         if not changed:
                             end = self.traj[j]
                             if start.line(end):
