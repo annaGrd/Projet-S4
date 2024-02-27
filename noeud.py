@@ -20,6 +20,9 @@ class Noeud:
         else:
             return False
 
+    def __repr__(self):
+        return f"[{round(self.x,2)}, {round(self.y,2)}, {round(self.z,2)}]"
+
     def parent(self):
         for voisin in self.voisins:
 

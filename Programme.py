@@ -18,7 +18,6 @@ def main(xa, Xobs, xgoal):
     listTraj = []
 
     while norme(T.xa, T.xgoal) > rprox:  # à modifier en dynamique
-        print(norme(T.xa, T.xgoal))
         _, change_xgoal = False, False #update(T)
         if change_xgoal:
             for x in T.Vt:
