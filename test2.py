@@ -8,9 +8,8 @@ fig = plt.figure()
 ax = fig.add_subplot(projection="3d")
 
 xa = Noeud()
-xgoal = Noeud(30, 30, 20)
 
-listDronePositions, listTraj = main(xa, [], xgoal)
+listDronePositions, listTraj = main(xa, [])
 
 def update_fig(i):
     artists = []

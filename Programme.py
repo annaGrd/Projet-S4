@@ -2,27 +2,33 @@ from time import time
 
 import numpy as np
 
-from dynamic import update
+from dynamic import update_goal_and_obstacles
 from tree import Tree
 from noeud import Noeud
 from constants import rprox, k
 from utils_grid import norme
 
 
-def main(xa, Xobs, xgoal):
+def main(xa, Xobs):
     # Algo 1
-    T = Tree([xa], xa, xgoal)
+    T = Tree([xa], xa)
 
     # test
     listDronePositions = []
     listTraj = []
 
-    while norme(T.xa, T.xgoal) > rprox:  # à modifier en dynamique
-        print(norme(T.xa, T.xgoal))
-        _, change_xgoal = False, False #update(T)
+    beginExecutionTime = time()
+
+    while time() - beginExecutionTime < 90:  # à modifier en dynamique
+        change_xgoal = update_goal_and_obstacles(T, time()-beginExecutionTime)
         if change_xgoal:
+            print("Changement d'objectif")
             for x in T.Vt:
                 x.already_seen = False
+
+            T.traj = [T.root]  # On reset le chemin à chaque chanqement d'objectif
+
+        print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
 
         t = time()
         while time() - t < 2:  # Durée arbitraire
@@ -34,7 +40,7 @@ def main(xa, Xobs, xgoal):
             T.traj.pop(0)
             T.root = T.traj[0]
             T.root.ci = 0
-            T.traj[0].recalculate_child_costs()
+            T.root.recalculate_child_costs(change_of_root=True)
             T.Qs = list()
         # envoyer la traj au drone, il va vers xo si moving == True
         # code de test

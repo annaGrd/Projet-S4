@@ -269,11 +269,11 @@ class Tree:
     def plan(self):
         # Algo 6
 
-        if self.xa.line(self.xgoal):
+        """if self.xa.line(self.xgoal):
             self.traj = [self.root, self.xgoal]
-            return True
+            return True"""
 
-        elif self.goal_reached()[0]:
+        if self.goal_reached()[0]:
             xclosest = self.closest_node(self.xgoal)
             path = [xclosest]
             while xclosest is not None:
