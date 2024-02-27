@@ -102,11 +102,11 @@ class Noeud:
                 return False
         return True
 
-    def unblock(self):
+    def not_seen(self):
         """
         Débloque le noeuds ainsi que ses ancêtres (utilise quand on ajoute une node ou qu'on rewire)
         """
         self.already_seen = False
         pa = self.parent()
         if pa is not None:
-            pa.unblock()
+            pa.not_seen()

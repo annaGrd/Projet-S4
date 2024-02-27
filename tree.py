@@ -130,7 +130,7 @@ class Tree:
         self.add_link(xnew, xmin)
         self.add_node_to_cell(xnew)
         xnew.ci = xmin.ci + norme(xmin, xnew)
-        xnew.unblock()
+        xnew.not_seen()
 
     def rewire_random_node(self):
         # Algo 4
@@ -153,8 +153,8 @@ class Tree:
                         self.remove_link(xnear, pa)
                     xr.recalculate_child_costs()
 
-                    xr.unblock()
-                    xnear.unblock()
+                    xr.not_seen()
+                    xnear.not_seen()
 
                     self.Qr.append(xnear)
 
@@ -182,8 +182,8 @@ class Tree:
                         self.remove_link(xnear, pa)
                     xs.recalculate_child_costs()
 
-                    xs.unblock()
-                    xnear.unblock()
+                    xs.not_seen()
+                    xnear.not_seen()
 
                 if xnear not in self.mem:
                     self.Qs.append(xnear)
@@ -313,8 +313,8 @@ class Tree:
         fin1 survient si on a tracé une ligne avec le dernier point de la traj en tant qu'extrémité finale
         fin2 survient si on n'a pas réussi à tracer une ligne sur le bout de trajectoire analysé
         rg_end: rang du noeud end du précédent opti_traj
-        recursivity=False: on ne fait qu'un seul raccourci, le plus proche de root, si cela est possible évidement.
-        recursivity=True: on optimise toute la trajectoire.
+        recursivity = False : on ne fait qu'un seul raccourci, le plus proche de root, si cela est possible évidement.
+        recursivity = True : on optimise toute la trajectoire.
         """
         finish_prime = finish
 
