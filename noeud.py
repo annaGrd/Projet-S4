@@ -93,7 +93,8 @@ class Noeud:
 
         coord1 = np.array([self.x, self.y, self.z])
         coord2 = np.array([other.x, other.y, other.z])
-        coord_unitaire = (coord2 - coord1) / numb_try
+        if numb_try:
+            coord_unitaire = (coord2 - coord1) / numb_try
 
         for i in range(numb_try):
             coord_on_line = coord1 + i * coord_unitaire
