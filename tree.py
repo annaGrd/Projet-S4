@@ -17,6 +17,7 @@ class Tree:
         self.Et = list()
         self.Vt = noeuds
         self.Qs = list()
+        self.mem = list()
         self.Qr = list()
         self.traj = [xa]
         self.xa = xa  # position du drone
@@ -26,7 +27,6 @@ class Tree:
         self.nbcellx = len(self.cell)
         self.nbcelly = len(self.cell[0])
         self.nbcellz = len(self.cell[0][0])
-        self.restart = False  # condition pour algo 6
         self.rewire_radius = .0  # condition pour reset de Qs
 
         xa.ci = 0
@@ -135,7 +135,7 @@ class Tree:
     def rewire_random_node(self):
         # Algo 4
         t = time()
-        while t - time() < .01 and len(self.Qr) > 0:  # Temps arbitraire
+        while t - time() < .1 and len(self.Qr) > 0:  # Temps arbitraire
 
             xr = self.Qr.pop(0)
             Xnear = self.find_nodes_near(xr)
@@ -162,6 +162,7 @@ class Tree:
         # Algo 5
         if not self.Qs:
             self.Qs.append(self.root)
+            self.mem = [self.root]
 
         t = time()
         while time() - t < .1 and self.Qs:
@@ -171,7 +172,7 @@ class Tree:
             for xnear in Xnear:
 
                 cold = xnear.ci
-                cnew = xnear.ci + norme(xs, xnear)
+                cnew = xs.ci + norme(xs, xnear)
 
                 if cnew < cold and xs.line(xnear):
                     pa = xnear.parent()
@@ -184,8 +185,9 @@ class Tree:
                     xs.unblock()
                     xnear.unblock()
 
-                if xnear not in self.Qs and self.restart:
+                if xnear not in self.mem:
                     self.Qs.append(xnear)
+                    self.mem.append(xnear)
             self.rewire_radius = xs.ci
 
     def find_nodes_near(self, x):
@@ -287,7 +289,7 @@ class Tree:
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
                 self.traj = path
-                self.opti_traj(0, [])
+                #self.opti_traj(0, [])
 
             if norme(self.traj[-1], self.xgoal) > norme(self.xa, self.xgoal):
                 return False

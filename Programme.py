@@ -25,7 +25,7 @@ def main(xa, Xobs, xgoal):
                 x.already_seen = False
 
         t = time()
-        while time() - t < .5:  # Durée arbitraire
+        while time() - t < 2:  # Durée arbitraire
             T.expansion_and_rewiring()
 
         moving = T.plan()
@@ -35,11 +35,10 @@ def main(xa, Xobs, xgoal):
             T.root = T.traj[0]
             T.root.ci = 0
             T.traj[0].recalculate_child_costs()
-            T.restart = True
             T.Qs = list()
         # envoyer la traj au drone, il va vers xo si moving == True
         # code de test
-        velocity = 1
+        velocity = 4
         if len(T.traj) > 1 and moving:
             coordinatesXa = np.array([T.xa.x, T.xa.y, T.xa.z])
             coordinatesX1 = np.array([T.traj[1].x, T.traj[1].y, T.traj[1].z])
