@@ -280,7 +280,7 @@ class Tree:
                 xclosest = xclosest.parent()
                 path.insert(0, xclosest)
             self.traj = path[1:]
-            self.opti_traj(0, [], False)
+            self.opti_traj(0, [], False, False)
             return True
         else:
             path = [self.root]
@@ -290,7 +290,7 @@ class Tree:
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
                 self.traj = path
-                self.opti_traj(0, [], False)
+                self.opti_traj(0, [], False, False)
 
             if norme(self.traj[-1], self.xgoal) > norme(self.xa, self.xgoal):
                 return False
@@ -306,13 +306,15 @@ class Tree:
 
         return True
 
-    def opti_traj(self, rg_end, new_traj, finish):
+    def opti_traj(self, rg_end, new_traj, finish, recursivity=True):
         """
         finish et finish_prime: variables qui indiquent si on arrive à analyser toute la trajectoire.
         Elles permettent d'interrompre la récursion, car on a terminé d'analyser la trajectoire.
         fin1 survient si on a tracé une ligne avec le dernier point de la traj en tant qu'extrémité finale
         fin2 survient si on n'a pas réussi à tracer une ligne sur le bout de trajectoire analysé
         rg_end: rang du noeud end du précédent opti_traj
+        recursivity=False: on ne fait qu'un seul raccourci, le plus proche de root, si cela est possible évidement.
+        recursivity=True: on optimise toute la trajectoire.
         """
         finish_prime = finish
 
@@ -331,7 +333,8 @@ class Tree:
                         self.remove_link(end, end.parent())
                         self.add_link(start, end)
                         start.recalculate_child_costs()
-                        finish = self.opti_traj(j, new_traj, finish)
+                        if recursivity: finish = self.opti_traj(j, new_traj, finish)
+                        finish = True
                     if finish:
                         finish_prime = True
                         break
@@ -339,7 +342,7 @@ class Tree:
                     break
             
             # fin2
-            if not finish and self.traj[-2] not in new_traj and self.traj[-1] not in new_traj:
+            if (not finish or not recursivity) and self.traj[-2] not in new_traj and self.traj[-1] not in new_traj:
                 new_traj.append(self.traj[-2])
                 new_traj.append(self.traj[-1])
             self.traj = new_traj
