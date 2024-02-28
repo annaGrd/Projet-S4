@@ -20,6 +20,9 @@ class Noeud:
         else:
             return False
 
+    def __bool__(self):
+        return self != Noeud()
+
     def __repr__(self):
         return f"[{round(self.x,2)}, {round(self.y,2)}, {round(self.z,2)}]"
 
