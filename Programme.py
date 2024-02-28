@@ -51,13 +51,24 @@ def main(xa, Xobs):
             T.root.recalculate_child_costs(change_of_root=True)
             T.Qs = list()
         # envoyer la traj au drone, il va vers xo si moving == True
+
+        # Si jamais le drone s'est éloigné de la racine actuelle et que le chemin change, il y a 2 cas
+        # - Si il n'y a pas d'obstacles entre le drone et le prochain objectif, il peut y aller
+        # - Si il y a un obstacle entre le drone et le prochain objectif, il se dirige vers la racine
+        toGo = None
+        if len(T.traj) > 1 and moving:
+            if T.traj[1].line(T.xa):
+                toGo = T.traj[1]
+            else:
+                toGo = T.traj[0]
+
         # code de test
         velocity = 4
-        if len(T.traj) > 1 and moving:
+        if toGo is not None:
             coordinatesXa = np.array([T.xa.x, T.xa.y, T.xa.z])
-            coordinatesX1 = np.array([T.traj[1].x, T.traj[1].y, T.traj[1].z])
-            if norme(T.xa, T.traj[1]) != 0:
-                coordinatesNewXa = (coordinatesX1 - coordinatesXa) / norme(T.xa, T.traj[1]) * min(velocity, norme(T.xa, T.traj[1])) + coordinatesXa
+            coordinatesX1 = np.array([toGo.x, toGo.y, toGo.z])
+            if norme(T.xa, toGo) != 0:
+                coordinatesNewXa = (coordinatesX1 - coordinatesXa) / norme(T.xa, toGo) * min(velocity, norme(T.xa, toGo)) + coordinatesXa
                 T.xa = Noeud(coordinatesNewXa[0], coordinatesNewXa[1], coordinatesNewXa[2])
 
         listDronePositions.append(T.xa)
