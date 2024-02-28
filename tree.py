@@ -57,7 +57,7 @@ class Tree:
             root = np.array([xo.x, xo.y, xo.z])
             goal = np.array([xgoal.x, xgoal.y, xgoal.z])
 
-            return ellipse_sampling(root, goal, a, b)
+            return ellipse_sampling(self, root, goal, a, b)
 
     def remove_link(self, x0, x1):
         if (x0, x1) in self.Et:

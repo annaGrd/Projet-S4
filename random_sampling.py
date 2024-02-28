@@ -10,7 +10,19 @@ def ellipsoid(x, y, z, a, b):
     return (x**2 + y**2) / b**2 + z**2 / a**2 <= 1
 
 
-def ellipse_sampling(root, goal, a, b):
+def reduce_distance_to_rs(x0, x1):
+    """
+    Retourne des coordonnées pour que le nœud soit au maximum à une distance rs du noeud le plus proche
+    """
+    coordinatesX1 = np.array([x1.x, x1.y, x1.z])
+    coordinatesX0 = np.array([x0.x, x0.y, x0.z])
+
+    coordinatesNewX = (coordinatesX1 - coordinatesX0) / norme(x1, x0) * rs + coordinatesX0
+    newX = Noeud(coordinatesNewX[0], coordinatesNewX[1], coordinatesNewX[2])
+    return newX
+
+
+def ellipse_sampling(T, root, goal, a, b):
     """
     Renvoie des coordonnées aléatoires dans une ellipsoïde paramétrée autour de xo et xgoal
     """
@@ -26,21 +38,16 @@ def ellipse_sampling(root, goal, a, b):
 
     new = reference_change(root, goal, new)
     newNode = Noeud(new[0], new[1], new[2])
-    if not inGrid(newNode): return ellipse_sampling(root, goal, a, b)
+
+    if not inGrid(newNode): return ellipse_sampling(T, root, goal, a, b)
+
+    closestNode = T.closest_node(newNode)
+    if norme(newNode, closestNode) > rs:
+        newNode = reduce_distance_to_rs(closestNode, newNode)
+
+    if not inGrid(newNode): return ellipse_sampling(T, root, goal, a, b)
 
     return newNode
-
-
-def reduce_distance_to_rs(x0, x1):
-    """
-    Retourne des coordonnées pour que le nœud soit au maximum à une distance rs du noeud le plus proche
-    """
-    coordinatesX1 = np.array([x1.x, x1.y, x1.z])
-    coordinatesX0 = np.array([x0.x, x0.y, x0.z])
-
-    coordinatesNewX = (coordinatesX1 - coordinatesX0) / norme(x1, x0) * rs + coordinatesX0
-    newX = Noeud(coordinatesNewX[0], coordinatesNewX[1], coordinatesNewX[2])
-    return newX
 
 
 def line_sampling(xclose, xgoal):
