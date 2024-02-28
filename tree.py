@@ -333,8 +333,11 @@ class Tree:
                         self.remove_link(end, end.parent())
                         self.add_link(start, end)
                         start.recalculate_child_costs()
-                        if recursivity: finish = self.opti_traj(j, new_traj, finish)
-                        finish = True
+                        if recursivity:
+                            finish = self.opti_traj(j, new_traj, finish)
+                        elif j != len(self.traj)-1:
+                            finish = True
+                            new_traj.extend(self.traj[j+1:])
                     if finish:
                         finish_prime = True
                         break
@@ -342,7 +345,7 @@ class Tree:
                     break
             
             # fin2
-            if (not finish or not recursivity) and self.traj[-2] not in new_traj and self.traj[-1] not in new_traj:
+            if not finish and self.traj[-2] not in new_traj and self.traj[-1] not in new_traj:
                 new_traj.append(self.traj[-2])
                 new_traj.append(self.traj[-1])
             self.traj = new_traj
