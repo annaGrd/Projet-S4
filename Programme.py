@@ -56,8 +56,9 @@ def main(xa, Xobs):
         if len(T.traj) > 1 and moving:
             coordinatesXa = np.array([T.xa.x, T.xa.y, T.xa.z])
             coordinatesX1 = np.array([T.traj[1].x, T.traj[1].y, T.traj[1].z])
-            coordinatesNewXa = (coordinatesX1 - coordinatesXa) / norme(T.xa, T.traj[1]) * min(velocity, norme(T.xa, T.traj[1])) + coordinatesXa
-            T.xa = Noeud(coordinatesNewXa[0], coordinatesNewXa[1], coordinatesNewXa[2])
+            if norme(T.xa, T.traj[1]) != 0:
+                coordinatesNewXa = (coordinatesX1 - coordinatesXa) / norme(T.xa, T.traj[1]) * min(velocity, norme(T.xa, T.traj[1])) + coordinatesXa
+                T.xa = Noeud(coordinatesNewXa[0], coordinatesNewXa[1], coordinatesNewXa[2])
 
         listDronePositions.append(T.xa)
         listTraj.append(T.traj)

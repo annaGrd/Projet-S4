@@ -1,4 +1,3 @@
-import tarfile
 from time import time
 
 from noeud import Noeud
@@ -142,6 +141,9 @@ class Tree:
 
             for xnear in Xnear:
 
+                if norme(xr, xnear) > rs:
+                    continue
+
                 cold = xnear.ci
                 cnew = xr.ci + norme(xr, xnear)
 
@@ -170,6 +172,9 @@ class Tree:
             Xnear = self.find_nodes_near(xs)
 
             for xnear in Xnear:
+
+                if norme(xs, xnear) > rs:
+                    continue
 
                 cold = xnear.ci
                 cnew = xs.ci + norme(xs, xnear)
