@@ -43,16 +43,19 @@ class Noeud:
         technique suffit, ce sera plus simple
 
         Si jamais on recalcule après un changement de racine, il ne faut plus prendre en compte l'ordre déjà établi par
-        les ci mais bien le nouvel ordre que l'on veut, d'où la modif de cet algo
+        les ci, mais bien le nouvel ordre que l'on veut, d'où la modif de cet algo
         """
 
         for x in self.voisins:
-            if (x.ci < self.ci and not change_of_root) or (change_of_root and new_parent is not None and x == new_parent): continue
-
-            potentialNewCost = self.ci + norme(x, self)
-            if potentialNewCost != x.ci:
-                x.ci = potentialNewCost
+            if x.block: # son cost est déjà établi
                 x.recalculate_child_costs(change_of_root=change_of_root, new_parent=self)
+            elif (x.ci < self.ci and not change_of_root) or (change_of_root and new_parent is not None and x == new_parent):
+                continue
+            else:
+                potentialNewCost = self.ci + norme(x, self)
+                if potentialNewCost != x.ci:
+                    x.ci = potentialNewCost
+                    x.recalculate_child_costs(change_of_root=change_of_root, new_parent=self)
 
     def fc(self, xgoal):
         """
