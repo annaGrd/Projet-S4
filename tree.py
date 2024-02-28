@@ -141,9 +141,6 @@ class Tree:
 
             for xnear in Xnear:
 
-                if norme(xr, xnear) > rs:
-                    continue
-
                 cold = xnear.ci
                 cnew = xr.ci + norme(xr, xnear)
 
@@ -172,9 +169,6 @@ class Tree:
             Xnear = self.find_nodes_near(xs)
 
             for xnear in Xnear:
-
-                if norme(xs, xnear) > rs:
-                    continue
 
                 cold = xnear.ci
                 cnew = xs.ci + norme(xs, xnear)
@@ -285,7 +279,7 @@ class Tree:
                 xclosest = xclosest.parent()
                 path.insert(0, xclosest)
             self.traj = path[1:]
-            self.opti_traj(0, [], False, False)
+            self.opti_traj(0, [], False)
             return True
         else:
             path = [self.root]
@@ -295,7 +289,6 @@ class Tree:
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
                 self.traj = path
-                self.opti_traj(0, [], False, False)
 
             if norme(self.traj[-1], self.xgoal) > norme(self.xa, self.xgoal):
                 return False
