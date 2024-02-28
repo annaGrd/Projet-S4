@@ -335,9 +335,10 @@ class Tree:
                 for j in range(len(self.traj)-1, i+1, -1):  # ne sert à rien de traiter start et son enfant en tant qu'extrémité de fin
                     end = self.traj[j]
                     if start.line(end):
+                        """
                         self.remove_link(end, end.parent())
                         self.add_link(start, end)
-                        start.recalculate_child_costs()
+                        start.recalculate_child_costs()"""
                         if recursivity:
                             finish = self.opti_traj(j, new_traj, finish)
                         elif j != len(self.traj)-1:
