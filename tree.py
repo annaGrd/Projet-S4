@@ -1,4 +1,3 @@
-import tarfile
 from time import time
 
 from noeud import Noeud
@@ -142,6 +141,9 @@ class Tree:
 
             for xnear in Xnear:
 
+                if norme(xr, xnear) > rs:
+                    continue
+
                 cold = xnear.ci
                 cnew = xr.ci + norme(xr, xnear)
 
@@ -170,6 +172,9 @@ class Tree:
             Xnear = self.find_nodes_near(xs)
 
             for xnear in Xnear:
+
+                if norme(xs, xnear) > rs:
+                    continue
 
                 cold = xnear.ci
                 cnew = xs.ci + norme(xs, xnear)
@@ -280,7 +285,7 @@ class Tree:
                 xclosest = xclosest.parent()
                 path.insert(0, xclosest)
             self.traj = path[1:]
-            self.opti_traj(0, [], False, False)
+            self.opti_traj(0, [], False)
             return True
         else:
             path = [self.root]
@@ -290,7 +295,6 @@ class Tree:
             path[-1].already_seen = True
             if not self.path_exists(self.traj) or norme(self.traj[-1], self.xgoal) > norme(path[-1], self.xgoal):
                 self.traj = path
-                self.opti_traj(0, [], False, False)
 
             if norme(self.traj[-1], self.xgoal) > norme(self.xa, self.xgoal):
                 return False
@@ -330,9 +334,9 @@ class Tree:
                 for j in range(len(self.traj)-1, i+1, -1):  # ne sert à rien de traiter start et son enfant en tant qu'extrémité de fin
                     end = self.traj[j]
                     if start.line(end):
-                        self.remove_link(end, end.parent())
+                        """self.remove_link(end, end.parent())
                         self.add_link(start, end)
-                        start.recalculate_child_costs()
+                        start.recalculate_child_costs()"""
                         if recursivity: finish = self.opti_traj(j, new_traj, finish)
                         finish = True
                     if finish:
