@@ -24,7 +24,7 @@ rs = 3  # Distance minimale entre deux noeuds
 alpha = .1  # Constante pour le random sampling
 beta = 2  # Constante pour le random sampling
 
-update_time = 10  # Durée entre deux updates
+update_time = .5  # Durée entre deux updates
 safety_radius = 5  # Rayon supplémentaire pour être sûr de prendre tous les noeuds dans la range d'un obstacle dynamique
 ro = 10  # Rayon dans lequel les obstacles dynamiques sont considérés par le drone (marqueur block)
 rg = 3  # Distance en dessous de laquelle, un nœud atteint xgoal

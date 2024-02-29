@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt, animation
+import numpy as np
 
 from Programme import main
 from constants import X, Xobs
@@ -9,7 +10,7 @@ ax = fig.add_subplot(projection="3d")
 
 xa = Noeud()
 
-listDronePositions, listTraj, listXgoal = main(xa, [])
+listDronePositions, listTraj, listXgoal, listDynamicObstacles = main(xa, [])
 
 def update_fig(i):
     artists = []
@@ -24,6 +25,15 @@ def update_fig(i):
             for y in [[xobs[1][0], xobs[1][0]], [xobs[1][1], xobs[1][0]], [xobs[1][1], xobs[1][1]]]:
                 for z in [[xobs[2][0], xobs[2][0]], [xobs[2][1], xobs[2][0]], [xobs[2][1], xobs[2][1]]]:
                     artists.append(ax.plot(x, y, z, color="black"))
+
+    for dobs in listDynamicObstacles[i]:
+        robs = dobs[3]
+        # Merci stackoverflow mdr
+        u, v = np.mgrid[0:2 * np.pi:30j, 0:np.pi:20j]
+        x = dobs[0] + robs*np.cos(u) * np.sin(v)
+        y = dobs[1] + robs*np.sin(u) * np.sin(v)
+        z = dobs[2] + robs*np.cos(v)
+        ax.plot_surface(x, y, z)
 
     dronePosition = listDronePositions[i]
 

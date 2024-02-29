@@ -5,7 +5,7 @@ from noeud import Noeud
 from constants import update_time, safety_radius, edge, ro
 from utils_grid import list_indices_at_range, norme, inGrid
 from math import inf
-from dynamic_obstacles import dynamic_obstacles
+from dynamic_obstacles import get_dynamic_obstacles
 
 """
 dynamic_obstacles est une liste contenant les obstacles dynamiques de la forme [x, y, z, vitesse]
@@ -67,7 +67,7 @@ def calcul_inrange(T, obs):
     if qx == T.nbcellx: qx -= 1
     if qy == T.nbcelly: qy -= 1
     if qz == T.nbcellz: qz -= 1
-    node_inrange = list(T.cell[qx, qy, qz])
+    node_inrange = list(T.cell[qx][qy][qz])
 
     gap = list_indices_at_range(1)
     for abscissa, ordinate, altitude in gap:
@@ -86,7 +86,7 @@ timeBeforeChange = 0
 
 global xgoal
 xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
-while not inGrid(xgoal, dynamic_obstacles):
+while not inGrid(xgoal):
     xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
 
 def update_goal_and_obstacles(T, t):
@@ -99,13 +99,14 @@ def update_goal_and_obstacles(T, t):
 
     if t - timeBeforeChange > 10:
         xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
-        while not inGrid(xgoal, dynamic_obstacles):
+        while not inGrid(xgoal):
             xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
         timeBeforeChange = t
 
     change_xgoal = (xgoal != T.xgoal)
     T.xgoal = xgoal
 
-    #update_block(T, dynamic_obstacles)
+    dynamicObstacles = get_dynamic_obstacles()
+    update_block(T, dynamicObstacles)
 
-    return change_xgoal
+    return change_xgoal, dynamicObstacles

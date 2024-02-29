@@ -5,7 +5,7 @@ import numpy as np
 from dynamic import update_goal_and_obstacles
 from tree import Tree
 from noeud import Noeud
-from constants import rprox, k
+from constants import rprox, k, update_time
 from utils_grid import norme
 
 
@@ -17,11 +17,13 @@ def main(xa, Xobs):
     listDronePositions = []
     listTraj = []
     listXgoal = []
+    listDynamicObstacles = []
 
     beginExecutionTime = time()
+    dynamicObstacles = []
 
-    while time() - beginExecutionTime < 300:  # à modifier en dynamique
-        change_xgoal = update_goal_and_obstacles(T, time()-beginExecutionTime)
+    while time() - beginExecutionTime < 10:  # à modifier en dynamique
+        change_xgoal, dynamicObstacles = update_goal_and_obstacles(T, time()-beginExecutionTime)
         if change_xgoal:
             print("Changement d'objectif")
             for x in T.Vt:
@@ -37,10 +39,10 @@ def main(xa, Xobs):
             T.traj = [T.root]  # On reset le chemin à chaque chanqement d'objectif
 
         print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
-        print(len(T.Vt))
+        print("Nombre de noeuds : " + str(len(T.Vt)))
 
         t = time()
-        while time() - t < .5:  # Durée arbitraire
+        while time() - t < update_time:  # Durée arbitraire
             T.expansion_and_rewiring()
 
         moving = T.plan()
@@ -75,7 +77,8 @@ def main(xa, Xobs):
         listDronePositions.append(T.xa)
         listTraj.append(T.traj)
         listXgoal.append(T.xgoal)
+        listDynamicObstacles.append(dynamicObstacles)
 
         print("")
 
-    return listDronePositions, listTraj, listXgoal
+    return listDronePositions, listTraj, listXgoal, listDynamicObstacles
