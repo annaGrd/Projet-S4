@@ -1,3 +1,4 @@
+from dynamic import dynamic_obstacles
 from ref_change import reference_change
 from random import uniform
 import numpy as np
@@ -39,13 +40,13 @@ def ellipse_sampling(T, root, goal, a, b):
     new = reference_change(root, goal, new)
     newNode = Noeud(new[0], new[1], new[2])
 
-    if not inGrid(newNode): return ellipse_sampling(T, root, goal, a, b)
+    if not inGrid(newNode, dynamic_obstacles): return ellipse_sampling(T, root, goal, a, b)
 
     closestNode = T.closest_node(newNode)
     if norme(newNode, closestNode) > rs:
         newNode = reduce_distance_to_rs(closestNode, newNode)
 
-    if not inGrid(newNode): return ellipse_sampling(T, root, goal, a, b)
+    if not inGrid(newNode, dynamic_obstacles): return ellipse_sampling(T, root, goal, a, b)
 
     return newNode
 
@@ -64,7 +65,7 @@ def line_sampling(xclose, xgoal):
     if norme(newNode, xclose) > rs:
         newNode = reduce_distance_to_rs(xclose, newNode)
 
-    if not inGrid(newNode): return line_sampling(xclose, xgoal)
+    if not inGrid(newNode, dynamic_obstacles): return line_sampling(xclose, xgoal)
 
     return newNode
 
@@ -82,6 +83,6 @@ def uniform_sampling(T):
     if norme(newNode, closestNode) > rs:
         newNode = reduce_distance_to_rs(closestNode, newNode)
 
-    if not inGrid(newNode): return uniform_sampling(T)
+    if not inGrid(newNode, dynamic_obstacles): return uniform_sampling(T)
 
     return newNode

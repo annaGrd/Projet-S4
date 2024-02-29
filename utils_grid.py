@@ -1,5 +1,5 @@
-from constants import Xobs, edge, X
-
+from constants import Xobs, edge, X, update_time, safety_radius
+from tree import Tree
 
 def norme(x1, x2):
     x = x1.x - x2.x
@@ -8,7 +8,7 @@ def norme(x1, x2):
     return (x**2 + y**2 + z**2)**0.5
 
 
-def inGrid(n):
+def inGrid(n, dynamic_obstacles):
     """
     Indique si le noeud est sur un espace libre de la grille
     """
@@ -18,6 +18,12 @@ def inGrid(n):
     for obs in Xobs:
         if (obs[0][0] <= n.x <= obs[0][1]) and (obs[1][0] <= n.y <= obs[1][1]) and (
                 obs[2][0] <= n.z <= obs[2][1]):
+            return False
+
+    for obs in dynamic_obstacles:
+        rb = update_time * obs[3] + safety_radius
+        if (abs(obs[0]-rb) <= n.x <= obs[0]+rb) and (abs(obs[1]-rb) <= n.y <= obs[1]+rb) and (
+                abs(obs[2]-rb) <= n.z <= obs[2]+rb):
             return False
     return True
 

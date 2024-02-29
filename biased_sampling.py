@@ -1,6 +1,7 @@
 from random import uniform, randint
 
 from constants import edge, rs, X
+from dynamic import dynamic_obstacles
 from noeud import Noeud
 from utils_grid import norme, inGrid, list_indices_at_range
 
@@ -31,7 +32,7 @@ def try_in_cell(T, chosen_cell, attempt):
     newNode = Noeud(x, y, z)
     closestNode = T.closest_node(newNode)
 
-    if not inGrid(newNode) or norme(newNode, closestNode) > rs: return try_in_cell(T, chosen_cell, attempt+1)
+    if not inGrid(newNode, dynamic_obstacles) or norme(newNode, closestNode) > rs: return try_in_cell(T, chosen_cell, attempt+1)
 
     return newNode
 

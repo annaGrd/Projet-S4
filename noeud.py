@@ -1,6 +1,7 @@
 import numpy as np
 from math import inf
 
+from dynamic import dynamic_obstacles
 from utils_grid import norme, inGrid
 
 
@@ -104,7 +105,7 @@ class Noeud:
 
         for i in range(numb_try):
             coord_on_line = coord1 + i * coord_unitaire
-            if not inGrid(Noeud(coord_on_line[0], coord_on_line[1], coord_on_line[2])):
+            if not inGrid(Noeud(coord_on_line[0], coord_on_line[1], coord_on_line[2]), dynamic_obstacles):
                 return False
         return True
 
