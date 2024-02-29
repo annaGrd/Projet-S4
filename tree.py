@@ -57,7 +57,15 @@ class Tree:
             root = np.array([xo.x, xo.y, xo.z])
             goal = np.array([xgoal.x, xgoal.y, xgoal.z])
 
-            return ellipse_sampling(self, root, goal, a, b)
+            #  "fix" temporaire, à debug plus en profondeur
+
+            if a == float("inf") or b == float("inf"):
+                return uniform_sampling(self)
+
+            try:
+                return ellipse_sampling(self, root, goal, a, b)
+            except:
+                return uniform_sampling(self)
 
     def remove_link(self, x0, x1):
         if (x0, x1) in self.Et:
@@ -65,14 +73,12 @@ class Tree:
         else:
             self.Et.remove((x1, x0))
 
-        x0.voisins.remove(x1)
-        x1.voisins.remove(x0)
+        x0.childs.remove(x1)
 
     def add_link(self, x0, x1):
 
         self.Et.append((x0, x1))  # faire un dictionnaire
-        x1.voisins.append(x0)
-        x0.voisins.append(x1)
+        x0.childs.append(x1)
 
     def closest_node(self, xrand):
         Xsi = self.mkeXsi(xrand)
@@ -126,8 +132,9 @@ class Tree:
                 xmin = xnear
 
         self.Vt.append(xnew)
-        self.add_link(xnew, xmin)
+        self.add_link(xmin, xnew)
         self.add_node_to_cell(xnew)
+        xnew.parent = xmin
         xnew.ci = xmin.ci + norme(xmin, xnew)
         xnew.not_seen()
 
@@ -141,16 +148,21 @@ class Tree:
 
             for xnear in Xnear:
 
+                if xnear.block:
+                    continue
+
                 cold = xnear.ci
                 cnew = xr.ci + norme(xr, xnear)
 
                 if cnew < cold and xr.line(xnear):
-                    pa = xnear.parent()
+                    pa = xnear.parent
 
                     self.add_link(xr, xnear)
                     if pa is not None:
-                        self.remove_link(xnear, pa)
-                    xr.recalculate_child_costs()
+                        self.remove_link(pa, xnear)
+                    xnear.parent = xr
+                    xnear.ci = cnew
+                    xnear.recalculate_child_costs()
 
                     xr.not_seen()
                     xnear.not_seen()
@@ -170,16 +182,22 @@ class Tree:
 
             for xnear in Xnear:
 
+                if xnear.block:
+                    continue
+
                 cold = xnear.ci
                 cnew = xs.ci + norme(xs, xnear)
 
                 if cnew < cold and xs.line(xnear):
-                    pa = xnear.parent()
+                    pa = xnear.parent
 
                     self.add_link(xs, xnear)
                     if pa is not None:
-                        self.remove_link(xnear, pa)
-                    xs.recalculate_child_costs()
+                        self.remove_link(pa, xnear)
+
+                    xnear.parent = xs
+                    xnear.ci = cnew
+                    xnear.recalculate_child_costs()
 
                     xs.not_seen()
                     xnear.not_seen()
@@ -246,21 +264,25 @@ class Tree:
 
     def goal_reached(self):
         xclose = self.closest_node(self.xgoal)
-        return norme(self.xgoal, xclose) < rg and xclose.line(self.xgoal), xclose
+        return xclose.ci < float("inf") and norme(self.xgoal, xclose) < rg and xclose.line(self.xgoal), xclose
 
     def deadEnd(self, x):
         """
         Indique si x est une extrémité actuellement.
         x peut-être une feuille ou ses enfants peuvent être bloqués.
         """
-        if len(x.voisins) < 2 and x != self.root:  # si n'a qu'un voisin (juste son parent)
+        if len(x.childs) < 2 and x != self.root:  # si n'a qu'un voisin (juste son parent)
             return True
 
-        pa = x.parent()
-        for v in x.voisins:
+        pa = x.parent
+        for v in x.childs:
             if pa is not None and v == pa:
-                pass
-            elif not v.already_seen:  # si un enfant n'est pas déjà vu
+                continue
+
+            if v.ci == float("inf"):
+                continue
+
+            if not v.already_seen:  # si un enfant n'est pas déjà vu
                 return False
 
         return True  # tous les enfants ont déjà été vus
@@ -276,7 +298,7 @@ class Tree:
             xclosest = self.closest_node(self.xgoal)
             path = [xclosest]
             while xclosest is not None:
-                xclosest = xclosest.parent()
+                xclosest = xclosest.parent
                 path.insert(0, xclosest)
             self.traj = path[1:]
             self.opti_traj(0, [], False)
@@ -328,10 +350,6 @@ class Tree:
                 for j in range(len(self.traj)-1, i+1, -1):  # ne sert à rien de traiter start et son enfant en tant qu'extrémité de fin
                     end = self.traj[j]
                     if start.line(end):
-                        """
-                        self.remove_link(end, end.parent())
-                        self.add_link(start, end)
-                        start.recalculate_child_costs()"""
                         if recursivity:
                             finish = self.opti_traj(j, new_traj, finish)
                         elif j != len(self.traj)-1:

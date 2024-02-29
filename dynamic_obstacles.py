@@ -6,7 +6,8 @@ Le but ici est de simuler le fait que les informations arrivent en temps réel d
 t = time()
 
 def get_dynamic_obstacles():
-    relative_time = time() - t
-    y = 20 + 5*relative_time/10
+    relativeTime = time() - t
+    x = 10 + 5 * relativeTime / 60
+    y = 5 + 20 * relativeTime / 60
 
-    return [(15, y, 15, 1)]
+    return [(x, y, .5, 2)]

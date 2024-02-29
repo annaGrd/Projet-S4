@@ -123,8 +123,8 @@ if render:
 
     endTrajPath = endTrajByFrame[-1]
     ax.scatter(endTrajPath.x, endTrajPath.y, endTrajPath.z, color="green")
-    while endTrajPath.parent() is not None:
-        pa = endTrajPath.parent()
+    while endTrajPath.parent is not None:
+        pa = endTrajPath.parent
         ax.scatter(pa.x, pa.y, pa.z, color="blue")
         ax.plot([endTrajPath.x, pa.x], [endTrajPath.y, pa.y], [endTrajPath.z, pa.z], color="blue")
         endTrajPath = pa

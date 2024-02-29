@@ -5,14 +5,15 @@ from utils_grid import norme, inGrid
 
 
 class Noeud:
-    def __init__(self, x=0.0, y=0.0, z=0.0):
+    def __init__(self, x=0.0, y=0.0, z=0.0, parent=None):
         self.x = x
         self.y = y
         self.z = z
         self.block = False  # bloqué par obstacle dynamique
         self.already_seen = False  # vu ou non par l'algo 6 pour le xgoal actuel
         self.ci = float("inf")
-        self.voisins = []
+        self.childs = []
+        self.parent = parent
 
     def __eq__(self, other):
         if self.x == other.x and self.y == other.y and self.z == other.z:
@@ -26,15 +27,7 @@ class Noeud:
     def __repr__(self):
         return f"[{round(self.x,2)}, {round(self.y,2)}, {round(self.z,2)}]"
 
-    def parent(self):
-        for voisin in self.voisins:
-
-            if voisin.ci < self.ci:
-                return voisin
-
-        return None
-
-    def recalculate_child_costs(self, change_of_root=False, new_parent=None):
+    def recalculate_child_costs(self, change_of_root=False):
 
         """
         L'idée ici, c'est qu'à chaque fois qu'il y a une modification dans les liens entre les noeuds, on calcule
@@ -49,16 +42,18 @@ class Noeud:
         les ci, mais bien le nouvel ordre que l'on veut, d'où la modif de cet algo
         """
 
-        for x in self.voisins:
-            if x.block: # son cost est déjà établi
-                x.recalculate_child_costs(change_of_root=change_of_root, new_parent=self)
-            elif (x.ci < self.ci and not change_of_root) or (change_of_root and new_parent is not None and x == new_parent):
-                continue
-            else:
-                potentialNewCost = self.ci + norme(x, self)
-                if potentialNewCost != x.ci:
-                    x.ci = potentialNewCost
-                    x.recalculate_child_costs(change_of_root=change_of_root, new_parent=self)
+        for x in self.childs:
+            if change_of_root:
+                pa = x.parent
+                if pa is not None:
+                    x.childs.append(x.parent)
+                x.parent = self
+                x.childs.remove(self)
+
+            potentialNewCost = self.ci + norme(x, self)
+            if potentialNewCost != x.ci:
+                x.ci = potentialNewCost
+                x.recalculate_child_costs(change_of_root=change_of_root)
 
     def fc(self, xgoal):
         """
@@ -75,8 +70,7 @@ class Noeud:
         """
         Détermine l'enfant le plus pertinent pour notre prévision de trajectoire
         """
-        pa = self.parent()
-        v = [x for x in self.voisins if (pa is None or x != pa)]
+        v = [x for x in self.childs]
         fcs = [x.fc(xgoal) for x in v]
 
         fc_min = fcs[0]
@@ -113,6 +107,6 @@ class Noeud:
         Débloque le noeuds ainsi que ses ancêtres (utilise quand on ajoute une node ou qu'on rewire)
         """
         self.already_seen = False
-        pa = self.parent()
+        pa = self.parent
         if pa is not None:
             pa.not_seen()

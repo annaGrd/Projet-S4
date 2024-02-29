@@ -1,4 +1,5 @@
 from time import time
+from copy import deepcopy
 
 import numpy as np
 
@@ -18,11 +19,12 @@ def main(xa, Xobs):
     listTraj = []
     listXgoal = []
     listDynamicObstacles = []
+    listNodes = []
+    listLinks = []
 
     beginExecutionTime = time()
-    dynamicObstacles = []
 
-    while time() - beginExecutionTime < 10:  # à modifier en dynamique
+    while time() - beginExecutionTime < 60:  # à modifier en dynamique
         change_xgoal, dynamicObstacles = update_goal_and_obstacles(T, time()-beginExecutionTime)
         if change_xgoal:
             print("Changement d'objectif")
@@ -45,15 +47,20 @@ def main(xa, Xobs):
         while time() - t < update_time:  # Durée arbitraire
             T.expansion_and_rewiring()
 
-        moving = T.plan()
         if len(T.traj) > 1 and norme(T.xa, T.traj[1]) <= rprox:  # Ou faire avec le ci de traj[0]
 
             T.traj.pop(0)
             T.root = T.traj[0]
             T.root.ci = 0
+            if T.root.parent is not None:
+                T.root.childs.append(T.root.parent)
+                T.root.parent = None
+
             T.root.recalculate_child_costs(change_of_root=True)
             T.Qs = list()
         # envoyer la traj au drone, il va vers xo si moving == True
+
+        moving = T.plan()
 
         # Si jamais le drone s'est éloigné de la racine actuelle et que le chemin change, il y a 2 cas
         # - Si il n'y a pas d'obstacles entre le drone et le prochain objectif, il peut y aller
@@ -78,7 +85,9 @@ def main(xa, Xobs):
         listTraj.append(T.traj)
         listXgoal.append(T.xgoal)
         listDynamicObstacles.append(dynamicObstacles)
+        listNodes.append(deepcopy(T.Vt))
+        listLinks.append(deepcopy(T.Et))
 
         print("")
 
-    return listDronePositions, listTraj, listXgoal, listDynamicObstacles
+    return listDronePositions, listTraj, listXgoal, listDynamicObstacles, listNodes, listLinks

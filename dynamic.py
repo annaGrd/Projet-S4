@@ -37,16 +37,18 @@ def update_block(T, dynamic_obstacles):
             for x in x_inrange:
                 if x.ci < T.rewire_radius:
                     T.Qs.clear()
-                    T.restart = True
                 if x.block: blocked.remove(x)
                 x.block = True
                 x.ci = float("inf")
+                x.recalculate_child_costs()
+
+
 
     # il ne reste plus que les noeuds qui ne sont plus en range d'un obstacle
     for x in blocked:
         x.block = False
-        pa = x.parent()
-        if pa.ci < inf:  # si le parent n'était pas bloqué, on calcule le ci de notre nœud débloqué et de ses enfants
+        pa = x.parent
+        if pa is not None and pa.ci < inf:  # si le parent n'était pas bloqué, on calcule le ci de notre nœud débloqué et de ses enfants
             x.ci = pa.ci + norme(x, pa)
             x.recalculate_child_costs()
 
@@ -58,7 +60,7 @@ def calcul_inrange(T, obs):
     Dans le papier, j'imagine que les obstacles dynamiques se déplacent à la même vitesse,
     donc pas besoin de faire un rb adapté à chaque obstacle dynamique, mais j'imagine que
     qui peut le plus, peut le moins."""
-    rb = update_time * obs[3] + safety_radius
+    rb = obs[3] + safety_radius
 
     qx = int(obs[0] // edge)
     qy = int(obs[1] // edge)
@@ -69,15 +71,18 @@ def calcul_inrange(T, obs):
     if qz == T.nbcellz: qz -= 1
     node_inrange = list(T.cell[qx][qy][qz])
 
-    gap = list_indices_at_range(1)
-    for abscissa, ordinate, altitude in gap:
-        if not (
-                0 <= qx + abscissa < T.nbcellx and 0 <= qy + ordinate < T.nbcelly and 0 <= qz + altitude < T.nbcellz): continue
-        cell = T.cell[qx + abscissa][qy + ordinate][qz + altitude]
-        node_inrange.extend(cell)
+    radius = 1
+    node_inrange_in_radius = []
+    while radius == 1 or node_inrange_in_radius:
+        node_inrange_in_radius = []
+        gap = list_indices_at_range(radius)
+        for abscissa, ordinate, altitude in gap:
+            if not (0 <= qx + abscissa < T.nbcellx and 0 <= qy + ordinate < T.nbcelly and 0 <= qz + altitude < T.nbcellz):
+                continue
 
-    for x in node_inrange:
-        if norme(x, Noeud(obs[0], obs[1], obs[2])) > rb: node_inrange.remove(x)
+            node_inrange_in_radius.extend([x for x in T.cell[qx + abscissa][qy + ordinate][qz + altitude] if norme(x, Noeud(obs[0], obs[1], obs[2])) < rb])
+        node_inrange.extend(node_inrange_in_radius)
+        radius += 1
 
     return node_inrange
 

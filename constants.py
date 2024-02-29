@@ -1,9 +1,9 @@
 import numpy as np
 
 # Généralités
-X = np.array([[0, 30], [0, 30], [0, 30]])  # taille de grille
+X = np.array([[0, 30], [0, 30], [0, 2]])  # taille de grille
 
-Xobs = np.array([[[0, 25], [5, 10], [0, 30]], [[5, 30], [15, 20], [5, 30]]])  # liste des obstacles
+Xobs = np.array([[[0, 25], [8, 10], [0, 2]], [[5, 30], [18, 20], [0, 2]]])  # liste des obstacles
 vObs = 0  # Volume occupé par les obstacles
 k = 100 # nombre de points max dans la trajectoire
 
@@ -25,6 +25,6 @@ alpha = .1  # Constante pour le random sampling
 beta = 2  # Constante pour le random sampling
 
 update_time = .5  # Durée entre deux updates
-safety_radius = 5  # Rayon supplémentaire pour être sûr de prendre tous les noeuds dans la range d'un obstacle dynamique
-ro = 10  # Rayon dans lequel les obstacles dynamiques sont considérés par le drone (marqueur block)
+safety_radius = .5  # Rayon supplémentaire pour être sûr de prendre tous les noeuds dans la range d'un obstacle dynamique
+ro = 100  # Rayon dans lequel les obstacles dynamiques sont considérés par le drone (marqueur block)
 rg = 3  # Distance en dessous de laquelle, un nœud atteint xgoal
