@@ -10,7 +10,7 @@ ax = fig.add_subplot(projection="3d")
 
 xa = Noeud()
 
-listDronePositions, listTraj, listXgoal, listDynamicObstacles = main(xa, [])
+listDronePositions, listTraj, listXgoal, listDynamicObstacles, listNodes, listLinks = main(xa, [])
 
 def update_fig(i):
     artists = []
