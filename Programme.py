@@ -47,6 +47,8 @@ def main(xa, Xobs):
         while time() - t < update_time:  # Durée arbitraire
             T.expansion_and_rewiring()
 
+        moving = T.plan()
+
         if len(T.traj) > 1 and norme(T.xa, T.traj[1]) <= rprox:  # Ou faire avec le ci de traj[0]
 
             T.traj.pop(0)
@@ -59,8 +61,6 @@ def main(xa, Xobs):
             T.root.recalculate_child_costs(change_of_root=True)
             T.Qs = list()
         # envoyer la traj au drone, il va vers xo si moving == True
-
-        moving = T.plan()
 
         # Si jamais le drone s'est éloigné de la racine actuelle et que le chemin change, il y a 2 cas
         # - Si il n'y a pas d'obstacles entre le drone et le prochain objectif, il peut y aller
