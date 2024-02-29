@@ -1,7 +1,7 @@
 import numpy as np
 from math import inf
 
-from dynamic import dynamic_obstacles
+from dynamic_obstacles import dynamic_obstacles
 from utils_grid import norme, inGrid
 
 

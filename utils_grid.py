@@ -1,5 +1,4 @@
 from constants import Xobs, edge, X, update_time, safety_radius
-from tree import Tree
 
 def norme(x1, x2):
     x = x1.x - x2.x

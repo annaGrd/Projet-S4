@@ -23,7 +23,7 @@ def main(xa, Xobs):
     while time() - beginExecutionTime < 300:  # à modifier en dynamique
         change_xgoal = update_goal_and_obstacles(T, time()-beginExecutionTime)
         if change_xgoal:
-            # print("Changement d'objectif")
+            print("Changement d'objectif")
             for x in T.Vt:
                 x.already_seen = False
 
@@ -36,7 +36,8 @@ def main(xa, Xobs):
 
             T.traj = [T.root]  # On reset le chemin à chaque chanqement d'objectif
 
-        # print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
+        print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
+        print(len(T.Vt))
 
         t = time()
         while time() - t < .5:  # Durée arbitraire
@@ -74,5 +75,7 @@ def main(xa, Xobs):
         listDronePositions.append(T.xa)
         listTraj.append(T.traj)
         listXgoal.append(T.xgoal)
+
+        print("")
 
     return listDronePositions, listTraj, listXgoal

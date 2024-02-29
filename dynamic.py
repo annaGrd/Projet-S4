@@ -5,6 +5,7 @@ from noeud import Noeud
 from constants import update_time, safety_radius, edge, ro
 from utils_grid import list_indices_at_range, norme, inGrid
 from math import inf
+from dynamic_obstacles import dynamic_obstacles
 
 """
 dynamic_obstacles est une liste contenant les obstacles dynamiques de la forme [x, y, z, vitesse]
@@ -19,7 +20,6 @@ paf, on a une trajectoire établie et qui marche, pour notre obstacle. Si l'obst
 atteint l'extrémité de sa trajectoire, on peut le faire aller dans l'autre sens ou calculer
 une nouvelle trajectoire avec un xgoal aléatoire.
 """
-dynamic_obstacles = list()  # en attendant
 
 def update_block(T, dynamic_obstacles):
     # on récupère tous les noeuds marqués

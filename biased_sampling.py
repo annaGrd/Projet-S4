@@ -1,7 +1,7 @@
 from random import uniform, randint
 
 from constants import edge, rs, X
-from dynamic import dynamic_obstacles
+from dynamic_obstacles import dynamic_obstacles
 from noeud import Noeud
 from utils_grid import norme, inGrid, list_indices_at_range
 
