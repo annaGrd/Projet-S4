@@ -1,40 +1,9 @@
-from random import uniform, randint
+from random import randint
 
-from constants import edge, rs, X
-from dynamic_obstacles import dynamic_obstacles
+from constants import edge, X
 from noeud import Noeud
-from utils_grid import norme, inGrid, list_indices_at_range
-
-
-def biased_sampling(T):
-    """
-    Retourne un noeud aléatoire dans une zone spécifique de l'espace.
-    """
-    cell = option1(T)  # Choix entre option 1, 2 ou 3. Définit les cellules à étudier
-    return option4(T, cell)  # Choix entre option 4 ou 5. Retourne un noeud selon des critères choisis
-
-
-def try_in_cell(T, chosen_cell, attempt):
-    """
-    Tente de donner un noeud aléatoire dans chosen_cell
-    """
-    """
-    Si la condition est vraie, c'est qu'on a galéré à trouver un noeud dans la case
-    (peut-être qu'elle n'est pas accessible) donc on passe à la suivante.
-    Cela peut être dû à une trop grande densité d'obstacles ou à une distance supérieure à rs par rapport à l'arbre.
-    """
-    if attempt > 9: return Noeud()  # combien de tentatives on veut
-
-    x = uniform(chosen_cell[0], chosen_cell[0] + edge)
-    y = uniform(chosen_cell[1], chosen_cell[1] + edge)
-    z = uniform(chosen_cell[2], chosen_cell[2] + edge)
-
-    newNode = Noeud(x, y, z)
-    closestNode = T.closest_node(newNode)
-
-    if not inGrid(newNode, dynamic_obstacles) or norme(newNode, closestNode) > rs: return try_in_cell(T, chosen_cell, attempt+1)
-
-    return newNode
+from random_sampling import try_in_cell
+from utils_grid import list_indices_at_range
 
 
 # Option 1 : On prend toutes les cases de la grille

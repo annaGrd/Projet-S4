@@ -1,9 +1,9 @@
 from ref_change import reference_change
-from random import uniform
+from random import uniform, randint
 import numpy as np
 from utils_grid import inGrid, norme
 from noeud import Noeud
-from constants import X, rs
+from constants import X, rs, edge
 
 
 def ellipsoid(x, y, z, a, b):
@@ -84,4 +84,76 @@ def uniform_sampling(T):
 
     if not inGrid(newNode): return uniform_sampling(T)
 
+    return newNode
+
+
+def biased_sampling(T):
+    """
+    Retourne un noeud aléatoire dans une zone spécifique de l'espace.
+    Choix de l'option 5 : On fait une pondération de toutes les cases dans cell en fonction du nombre de noeuds
+    qu'elles contiennent. Moins elles contiennent des noeuds, plus elles ont de chances d'être choisies
+    """
+    if len(T.Vt) == 1:
+        return uniform_sampling(T)
+    lx = X[0][1]
+    ly = X[1][1]
+    lz = X[2][1]
+
+    nbCellsx, rx = divmod(lx, edge)
+    nbCellsy, ry = divmod(ly, edge)
+    nbCellsz, rz = divmod(lz, edge)
+    if rx: nbCellsx += 1
+    if ry: nbCellsy += 1
+    if rz: nbCellsz += 1
+
+    cell = [[i, j, k] for i in range(int(nbCellsz)) for j in range(int(nbCellsy)) for k in range(int(nbCellsx))]
+    weighting = list()
+    nb_min = len(T.Vt)
+    found_min = None
+    for coord in cell:
+        length_cell = len(T.cell[coord[0]][coord[1]][coord[2]])
+        weighting.extend([coord for _ in range(len(T.Vt)-length_cell)])
+        if nb_min >= length_cell and length_cell:
+            found_min = coord
+            nb_min = length_cell
+    found_node = False
+    while weighting:
+        rg = randint(0, len(weighting)-1)
+        chosen_cell = weighting[rg]
+        new_node = try_in_cell(T, chosen_cell, 0)
+        if new_node == Noeud():
+            weighting.remove(chosen_cell)
+        else:
+            found_node = True
+            break
+    """
+    Condition activée si on n'a vraiment pas chance, c'est-à-dire qu'on a tenté de mettre dix noeuds au pif
+    dans toutes les cases et ils n'étaient pas dans la grille ou trop loin de l'arbre.
+    """
+    if not found_node:
+        new_node = Noeud()
+        while not new_node:
+            new_node = try_in_cell(T, [found_min[0], found_min[1], found_min[2]], 0)
+    return new_node
+
+
+def try_in_cell(T, chosen_cell, attempt):
+    """
+    Tente de donner un noeud aléatoire dans chosen_cell
+    """
+    """
+    Si la condition est vraie, c'est qu'on a galéré à trouver un noeud dans la case
+    (peut-être qu'elle n'est pas accessible) donc on passe à la suivante.
+    Cela peut être dû à une trop grande densité d'obstacles ou à une distance supérieure à rs par rapport à l'arbre.
+    """
+    if attempt > 9: return Noeud()  # combien de tentatives on veut
+
+    x = uniform(chosen_cell[0], chosen_cell[0] + edge)
+    y = uniform(chosen_cell[1], chosen_cell[1] + edge)
+    z = uniform(chosen_cell[2], chosen_cell[2] + edge)
+    newNode = Noeud(x, y, z)
+    closestNode = T.closest_node(newNode)
+    if norme(newNode, closestNode) > rs:
+        newNode = reduce_distance_to_rs(closestNode, newNode)
+    if not inGrid(newNode): return try_in_cell(T, chosen_cell, attempt+1)
     return newNode
