@@ -3,12 +3,10 @@ from time import time
 """
 Le but ici est de simuler le fait que les informations arrivent en temps réel depuis l'extérieur
 """
-global t
 t = time()
 
 def get_dynamic_obstacles():
+    relative_time = time() - t
+    y = 20 + 5*relative_time/10
 
-    if time()-t < 5:
-        return [(15, 25, 15, 2)]
-    else:
-        return [(15, 20, 15, 2)]
+    return [(15, y, 15, 1)]
