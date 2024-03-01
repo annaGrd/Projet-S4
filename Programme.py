@@ -3,7 +3,8 @@ from copy import deepcopy
 
 import numpy as np
 
-from dynamic import update_goal_and_obstacles
+from dynamic import update_goal_and_obstacles, update_block
+from dynamic_obstacles import get_dynamic_obstacles
 from tree import Tree
 from noeud import Noeud
 from constants import rprox, update_time
@@ -53,6 +54,9 @@ def main(xa, Xobs):
         t = time()
         while time() - t < update_time:  # Durée arbitraire
             T.expansion_and_rewiring()
+
+        dynamicObstacles = get_dynamic_obstacles()
+        update_block(T, dynamicObstacles)
 
         moving = T.plan()
 

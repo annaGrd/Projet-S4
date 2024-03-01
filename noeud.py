@@ -89,7 +89,7 @@ class Noeud:
         Indique si l'on peut tracer une arête entre deux noeuds
         """
         dist = norme(self, other)
-        numb_try = int(dist)
+        numb_try = int(dist)*100
 
         coord1 = np.array([self.x, self.y, self.z])
         coord2 = np.array([other.x, other.y, other.z])
