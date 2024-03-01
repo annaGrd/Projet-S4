@@ -35,6 +35,9 @@ def main(xa, Xobs):
             if potentialRoot is not None:
                 T.root = potentialRoot  # Quand on change d'objectif, on prend comme racine le noeud le plus proche
                 T.root.ci = 0
+                if T.root.parent is not None:
+                    T.root.childs.append(T.root.parent)
+                    T.root.parent = None
                 T.root.recalculate_child_costs(change_of_root=True)
                 T.Qs = list()
 
