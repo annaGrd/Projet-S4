@@ -6,8 +6,20 @@ import numpy as np
 from dynamic import update_goal_and_obstacles
 from tree import Tree
 from noeud import Noeud
-from constants import rprox, k, update_time
+from constants import rprox, update_time
 from utils_grid import norme
+
+
+def update_root(T):
+    potentialRoot = T.closest_node(T.xa)
+    if potentialRoot is not None:
+        T.root = potentialRoot  # Quand on change d'objectif, on prend comme racine le noeud le plus proche
+        T.root.ci = 0
+        if T.root.parent is not None:
+            T.root.childs.append(T.root.parent)
+            T.root.parent = None
+        T.root.recalculate_child_costs(change_of_root=True)
+        T.Qs = list()
 
 
 def main(xa, Xobs):
@@ -31,15 +43,7 @@ def main(xa, Xobs):
             for x in T.Vt:
                 x.already_seen = False
 
-            potentialRoot = T.closest_node(T.xa)
-            if potentialRoot is not None:
-                T.root = potentialRoot  # Quand on change d'objectif, on prend comme racine le noeud le plus proche
-                T.root.ci = 0
-                if T.root.parent is not None:
-                    T.root.childs.append(T.root.parent)
-                    T.root.parent = None
-                T.root.recalculate_child_costs(change_of_root=True)
-                T.Qs = list()
+            update_root(T)
 
             T.traj = [T.root]  # On reset le chemin à chaque chanqement d'objectif
 
@@ -67,13 +71,15 @@ def main(xa, Xobs):
 
         # Si jamais le drone s'est éloigné de la racine actuelle et que le chemin change, il y a 2 cas
         # - Si il n'y a pas d'obstacles entre le drone et le prochain objectif, il peut y aller
-        # - Si il y a un obstacle entre le drone et le prochain objectif, il se dirige vers la racine
+        # - Si il y a un obstacle entre le drone et le prochain objectif, on actualise la racine et on recalcule la trajectoire
         toGo = None
         if len(T.traj) > 1 and moving:
-            if T.traj[1].line(T.xa):
-                toGo = T.traj[1]
-            else:
-                toGo = T.traj[0]
+
+            if not T.traj[1].line(T.xa):
+                update_root(T)
+                T.plan()
+
+            toGo = T.traj[1]
 
         # code de test
         velocity = 4
