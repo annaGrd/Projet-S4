@@ -33,7 +33,7 @@ class Noeud:
         L'idée ici, c'est qu'à chaque fois qu'il y a une modification dans les liens entre les noeuds, on calcule
         récursivement les couts des noeuds qui descendent du nouveau nœud parent (par ex xs ou xr pour les algos 4 et 5)
 
-        Pour les obstacles, il suffira de mettre le nœud bloqué avec un coup infini et d'exécuter cette fonction
+        Pour les obstacles, il suffira de mettre le nœud bloqué avec un cout infini et d'exécuter cette fonction
 
         Dans le papier, ils recalculent le cout uniquement quand il y a besoin, c'est vrai qui c'est mieux mais, si cette
         technique suffit, ce sera plus simple
