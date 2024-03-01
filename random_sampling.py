@@ -83,7 +83,6 @@ def uniform_sampling(T):
         newNode = reduce_distance_to_rs(closestNode, newNode)
 
     if not inGrid(newNode): return uniform_sampling(T)
-
     return newNode
 
 
@@ -106,7 +105,7 @@ def biased_sampling(T):
     if ry: nbCellsy += 1
     if rz: nbCellsz += 1
 
-    cell = [[i, j, k] for i in range(int(nbCellsz)) for j in range(int(nbCellsy)) for k in range(int(nbCellsx))]
+    cell = [[i, j, k] for i in range(int(nbCellsx)) for j in range(int(nbCellsy)) for k in range(int(nbCellsz))]
     weighting = list()
     nb_min = len(T.Vt)
     found_min = None
@@ -134,7 +133,6 @@ def biased_sampling(T):
         new_node = Noeud()
         while not new_node:
             new_node = try_in_cell(T, [found_min[0], found_min[1], found_min[2]], 0)
-    return new_node
 
 
 def try_in_cell(T, chosen_cell, attempt):
@@ -153,7 +151,7 @@ def try_in_cell(T, chosen_cell, attempt):
     z = uniform(chosen_cell[2], chosen_cell[2] + edge)
     newNode = Noeud(x, y, z)
     closestNode = T.closest_node(newNode)
-    if norme(newNode, closestNode) > rs:
-        newNode = reduce_distance_to_rs(closestNode, newNode)
-    if not inGrid(newNode): return try_in_cell(T, chosen_cell, attempt+1)
+    #if norme(newNode, closestNode) > rs:
+        #newNode = reduce_distance_to_rs(closestNode, newNode)
+    if not inGrid(newNode) : return try_in_cell(T, chosen_cell, attempt+1)
     return newNode
