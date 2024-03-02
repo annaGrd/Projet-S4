@@ -41,7 +41,8 @@ def update_block(T, dynamic_obstacles):
 
                 if x.ci < T.rewire_radius:
                     T.Qs.clear()
-                if x.block: blocked.remove(x)
+                if x in blocked:
+                    blocked.remove(x)
                 x.block = True
                 x.ci = float("inf")
                 x.recalculate_child_costs()
