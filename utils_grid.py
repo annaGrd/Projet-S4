@@ -1,6 +1,6 @@
 from math import sqrt
 
-from constants import Xobs, edge, X, update_time, safety_radius
+from constants import Xobs, edge, X, safety_radius
 from dynamic_obstacles import get_dynamic_obstacles
 
 def norme(x1, x2):
@@ -25,7 +25,7 @@ def inGrid(n):
     dynamicObstacles = get_dynamic_obstacles()
 
     for obs in dynamicObstacles:
-        rb = update_time * obs[3] + safety_radius
+        rb = obs[3] + safety_radius
         if sqrt((obs[0] - n.x)**2 + (obs[1] - n.y)**2 + (obs[2] - n.z)**2) < rb:
             return False
     return True

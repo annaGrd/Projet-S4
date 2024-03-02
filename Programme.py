@@ -36,6 +36,7 @@ def main(xa, Xobs):
     listLinks = []
 
     beginExecutionTime = time()
+    previousTraj = []
 
     while time() - beginExecutionTime < 60:  # à modifier en dynamique
         change_xgoal, dynamicObstacles = update_goal_and_obstacles(T, time()-beginExecutionTime)
@@ -48,6 +49,7 @@ def main(xa, Xobs):
 
             T.traj = [T.root]  # On reset le chemin à chaque chanqement d'objectif
 
+        print("Temps actuel :", time() - beginExecutionTime)
         print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
         print("Nombre de noeuds : " + str(len(T.Vt)))
 
@@ -59,6 +61,10 @@ def main(xa, Xobs):
         update_block(T, dynamicObstacles)
 
         moving = T.plan()
+
+        if previousTraj != T.traj:
+            update_root(T)
+            moving = T.plan()
 
         if len(T.traj) > 1 and norme(T.xa, T.traj[1]) <= rprox:  # Ou faire avec le ci de traj[0]
 
@@ -84,6 +90,8 @@ def main(xa, Xobs):
                 T.plan()
 
             toGo = T.traj[1]
+
+        previousTraj = list(T.traj)
 
         # code de test
         velocity = 4

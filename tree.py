@@ -271,7 +271,7 @@ class Tree:
         Indique si x est une extrémité actuellement.
         x peut-être une feuille ou ses enfants peuvent être bloqués.
         """
-        if len(x.childs) < 2 and x != self.root:  # si n'a qu'un voisin (juste son parent)
+        if len(x.childs) < 1 and x != self.root:  # si n'a pas d'enfants
             return True
 
         pa = x.parent
