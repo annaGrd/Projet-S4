@@ -35,6 +35,10 @@ def update_block(T, dynamic_obstacles):
 
             # si le nœud est déjà marqué, il le restera, sinon, il le devient
             for x in x_inrange:
+
+                if x == T.root:
+                    continue
+
                 if x.ci < T.rewire_radius:
                     T.Qs.clear()
                 if x.block: blocked.remove(x)
