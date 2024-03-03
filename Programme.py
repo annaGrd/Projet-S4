@@ -11,18 +11,6 @@ from constants import rprox, update_time
 from utils_grid import norme
 
 
-def update_root(T):
-    potentialRoot = T.closest_node(T.xa)
-    if potentialRoot is not None:
-        T.root = potentialRoot  # Quand on change d'objectif, on prend comme racine le noeud le plus proche
-        T.root.ci = 0
-        if T.root.parent is not None:
-            T.root.childs.append(T.root.parent)
-            T.root.parent = None
-        T.root.recalculate_child_costs(change_of_root=True)
-        T.Qs = list()
-
-
 def main(xa, Xobs):
     # Algo 1
     T = Tree([xa], xa)
@@ -45,7 +33,7 @@ def main(xa, Xobs):
             for x in T.Vt:
                 x.already_seen = False
 
-            update_root(T)
+            T.update_root()
 
             T.traj = [T.root]  # On reset le chemin à chaque chanqement d'objectif
 
@@ -63,20 +51,12 @@ def main(xa, Xobs):
         moving = T.plan()
 
         if previousTraj != T.traj:
-            update_root(T)
+            T.update_root()
             moving = T.plan()
 
         if len(T.traj) > 1 and norme(T.xa, T.traj[1]) <= rprox:  # Ou faire avec le ci de traj[0]
-
             T.traj.pop(0)
-            T.root = T.traj[0]
-            T.root.ci = 0
-            if T.root.parent is not None:
-                T.root.childs.append(T.root.parent)
-                T.root.parent = None
-
-            T.root.recalculate_child_costs(change_of_root=True)
-            T.Qs = list()
+            T.update_root(T.traj[0])
         # envoyer la traj au drone, il va vers xo si moving == True
 
         # Si jamais le drone s'est éloigné de la racine actuelle et que le chemin change, il y a 2 cas
@@ -86,7 +66,7 @@ def main(xa, Xobs):
         if len(T.traj) > 1 and moving:
 
             if not T.traj[1].line(T.xa):
-                update_root(T)
+                T.update_root()
                 T.plan()
 
             toGo = T.traj[1]

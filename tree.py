@@ -367,3 +367,15 @@ class Tree:
                 new_traj.append(self.traj[-1])
             self.traj = new_traj
             return True
+
+    def update_root(self, newRoot=None):
+        if newRoot is None:
+            newRoot = self.closest_node(self.xa)
+        if newRoot is not None:
+            self.root = newRoot  # Quand on change d'objectif, on prend comme racine le noeud le plus proche
+            self.root.ci = 0
+            if self.root.parent is not None:
+                self.root.childs.append(self.root.parent)
+                self.root.parent = None
+            self.root.recalculate_child_costs(change_of_root=True)
+            self.Qs = list()
