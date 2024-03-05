@@ -27,6 +27,7 @@ class Tree:
         self.nbcelly = len(self.cell[0])
         self.nbcellz = len(self.cell[0][0])
         self.rewire_radius = .0  # condition pour reset de Qs
+        self.nextNodeToGo = None
 
         xa.ci = 0
 

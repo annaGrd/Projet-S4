@@ -1,27 +1,19 @@
 from time import time
-from copy import deepcopy
-
-import numpy as np
 
 from dynamic import update_goal_and_obstacles, update_block
 from dynamic_obstacles import get_dynamic_obstacles
 from tree import Tree
-from noeud import Noeud
 from constants import rprox, update_time
 from utils_grid import norme
 
+T = Tree()
 
 def main(xa, Xobs):
     # Algo 1
-    T = Tree([xa], xa)
-
-    # test
-    listDronePositions = []
-    listTraj = []
-    listXgoal = []
-    listDynamicObstacles = []
-    listNodes = []
-    listLinks = []
+    T.root = xa
+    T.xgoal = xa
+    T.Vt = [xa]
+    T.add_node_to_cell(xa)
 
     beginExecutionTime = time()
     previousTraj = []
@@ -29,17 +21,12 @@ def main(xa, Xobs):
     while time() - beginExecutionTime < 60:  # à modifier en dynamique
         change_xgoal, dynamicObstacles = update_goal_and_obstacles(T, time()-beginExecutionTime)
         if change_xgoal:
-            print("Changement d'objectif")
             for x in T.Vt:
                 x.already_seen = False
 
             T.update_root()
 
             T.traj = [T.root]  # On reset le chemin à chaque chanqement d'objectif
-
-        print("Temps actuel :", time() - beginExecutionTime)
-        print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
-        print("Nombre de noeuds : " + str(len(T.Vt)))
 
         t = time()
         while time() - t < update_time:  # Durée arbitraire
@@ -73,22 +60,4 @@ def main(xa, Xobs):
 
         previousTraj = list(T.traj)
 
-        # code de test
-        velocity = 4
-        if toGo is not None:
-            coordinatesXa = np.array([T.xa.x, T.xa.y, T.xa.z])
-            coordinatesX1 = np.array([toGo.x, toGo.y, toGo.z])
-            if norme(T.xa, toGo) != 0:
-                coordinatesNewXa = (coordinatesX1 - coordinatesXa) / norme(T.xa, toGo) * min(velocity, norme(T.xa, toGo)) + coordinatesXa
-                T.xa = Noeud(coordinatesNewXa[0], coordinatesNewXa[1], coordinatesNewXa[2])
-
-        listDronePositions.append(T.xa)
-        listTraj.append(T.traj)
-        listXgoal.append(T.xgoal)
-        listDynamicObstacles.append(dynamicObstacles)
-        listNodes.append(deepcopy(T.Vt))
-        listLinks.append(deepcopy(T.Et))
-
-        print("")
-
-    return listDronePositions, listTraj, listXgoal, listDynamicObstacles, listNodes, listLinks
+        T.nextNodeToGo = toGo
