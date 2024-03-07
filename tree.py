@@ -212,7 +212,7 @@ class Tree:
         Crée Xnear
         """
         Xsi = self.mkeXsi(x)
-        epsilon = vFree ** (1/3) * ((3*kmax)/(4*pi*len(self.Vt))) ** (1/3)  # 3D -> mu(B_epsilon) = 4/3*pi*epsilon**3
+        epsilon = vFree ** (1 / 3) * ((3 * kmax) / (4 * pi * len(self.Vt))) ** (1 / 3)  # 3D -> mu(B_epsilon) = 4/3*pi*epsilon**3
         if epsilon < rs: epsilon = rs
 
         Xnear = []
@@ -237,7 +237,7 @@ class Tree:
         radius = 0
         extraRadius = 0
         empty = True
-        while extraRadius <= 2 and radius <= max(self.nbcellx, self.nbcelly, self.nbcellz): # Désigne le nombre de couches supplémentaires à considérer trouver une node
+        while extraRadius <= 2 and radius <= max(self.nbcellx, self.nbcelly, self.nbcellz):  # Désigne le nombre de couches supplémentaires à considérer trouver une node
             radius += 1
             gap = list_indices_at_range(radius)
             for abscissa, ordinate, altitude in gap:
@@ -289,7 +289,7 @@ class Tree:
 
     def plan(self):
         # Algo 6
-        
+
         """if self.xa.line(self.xgoal):
             self.traj = [self.root, self.xgoal]
             return True"""
@@ -344,17 +344,17 @@ class Tree:
             return True
 
         else:
-            for i in range(rg_end, len(self.traj)-2):  # ne sert à rien de traiter les deux derniers en tant qu'extrémité de début
+            for i in range(rg_end, len(self.traj) - 2):  # ne sert à rien de traiter les deux derniers en tant qu'extrémité de début
                 start = self.traj[i]
                 new_traj.append(start)
-                for j in range(len(self.traj)-1, i+1, -1):  # ne sert à rien de traiter start et son enfant en tant qu'extrémité de fin
+                for j in range(len(self.traj) - 1, i + 1, -1):  # ne sert à rien de traiter start et son enfant en tant qu'extrémité de fin
                     end = self.traj[j]
                     if start.line(end):
                         if recursivity:
                             finish = self.opti_traj(j, new_traj, finish)
-                        elif j != len(self.traj)-1:
+                        elif j != len(self.traj) - 1:
                             finish = True
-                            new_traj.extend(self.traj[j+1:])
+                            new_traj.extend(self.traj[j + 1:])
                     if finish:
                         finish_prime = True
                         break

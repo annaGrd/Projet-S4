@@ -27,6 +27,7 @@ def main(xa, Xobs):
     previousTraj = []
 
     while time() - beginExecutionTime < 60:  # à modifier en dynamique
+        # update de xa, import depuis csv
         change_xgoal, dynamicObstacles = update_goal_and_obstacles(T, time()-beginExecutionTime)
         if change_xgoal:
             print("Changement d'objectif")
@@ -35,7 +36,7 @@ def main(xa, Xobs):
 
             T.update_root()
 
-            T.traj = [T.root]  # On reset le chemin à chaque chanqement d'objectif
+            T.traj = [T.root]  # On reset le chemin à chaque changement d'objectif
 
         print("Temps actuel :", time() - beginExecutionTime)
         print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
@@ -60,8 +61,8 @@ def main(xa, Xobs):
         # envoyer la traj au drone, il va vers xo si moving == True
 
         # Si jamais le drone s'est éloigné de la racine actuelle et que le chemin change, il y a 2 cas
-        # - Si il n'y a pas d'obstacles entre le drone et le prochain objectif, il peut y aller
-        # - Si il y a un obstacle entre le drone et le prochain objectif, on actualise la racine et on recalcule la trajectoire
+        # - S'il n'y a pas d'obstacles entre le drone et le prochain objectif, il peut y aller
+        # - S'il y a un obstacle entre le drone et le prochain objectif, on actualise la racine et on recalcule la trajectoire
         toGo = None
         if len(T.traj) > 1 and moving:
 
@@ -70,6 +71,7 @@ def main(xa, Xobs):
                 T.plan()
 
             toGo = T.traj[1]
+            # modif du csv
 
         previousTraj = list(T.traj)
 

@@ -1,5 +1,4 @@
 from random import randint
-from time import time
 
 from noeud import Noeud
 from constants import update_time, safety_radius, edge, ro
@@ -65,7 +64,7 @@ def calcul_inrange(T, obs):
     Dans le papier, j'imagine que les obstacles dynamiques se déplacent à la même vitesse,
     donc pas besoin de faire un rb adapté à chaque obstacle dynamique, mais j'imagine que
     qui peut le plus, peut le moins."""
-    rb = obs[3] + safety_radius
+    rb = update_time * obs[3] + safety_radius
 
     qx = int(obs[0] // edge)
     qy = int(obs[1] // edge)
