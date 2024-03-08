@@ -269,7 +269,7 @@ class Tree:
     def deadEnd(self, x):
         """
         Indique si x est une extrémité actuellement.
-        x peut-être une feuille ou ses enfants peuvent être bloqués.
+        x peut être une feuille ou ses enfants peuvent être bloqués.
         """
         if len(x.childs) < 1 and x != self.root:  # si n'a pas d'enfants
             return True

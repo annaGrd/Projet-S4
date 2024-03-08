@@ -99,7 +99,7 @@ while not inGrid(xgoal):
     xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
 
 def update_goal_and_obstacles(T, t):
-    """Récupère xa, xgoal, les coordonnées des obstacles dynamiques,
+    """Récupère xgoal, les coordonnées des obstacles dynamiques,
     met à jour l'arbre et les marqueurs block.
     Retourne les changements"""
 

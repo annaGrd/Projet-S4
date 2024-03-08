@@ -27,7 +27,8 @@ def main(xa, Xobs):
     previousTraj = []
 
     while time() - beginExecutionTime < 60:  # à modifier en dynamique
-        # update de xa, import depuis csv
+        x, y, z, _ = open('m_to_py.csv')
+        T.xa = Noeud(float(x), float(y), float(z))
         change_xgoal, dynamicObstacles = update_goal_and_obstacles(T, time()-beginExecutionTime)
         if change_xgoal:
             print("Changement d'objectif")
