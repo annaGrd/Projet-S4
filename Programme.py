@@ -14,6 +14,8 @@ from utils_grid import norme
 def main(xa, Xobs):
     # Algo 1
     T = Tree([xa], xa)
+    with open("m_to_py.csv", "w") as file:
+        file.write(f"{0}\n{0}\n{0}\n{0}\n{0}\n{0}\n")
 
     # test
     listDronePositions = []
@@ -26,8 +28,11 @@ def main(xa, Xobs):
     beginExecutionTime = time()
     previousTraj = []
 
-    while time() - beginExecutionTime < 60:  # à modifier en dynamique
-        x, y, z, _ = open('m_to_py.csv')
+    while time() - beginExecutionTime < 300:  # à modifier en dynamique
+        pos = open('m_to_py.csv').read().split("\n")[:-1]
+        while not pos:
+            pos = open('m_to_py.csv').read().split("\n")[:-1]
+        x, y, z, _, _, _ = pos
         T.xa = Noeud(float(x), float(y), float(z))
         change_xgoal, dynamicObstacles = update_goal_and_obstacles(T, time()-beginExecutionTime)
         if change_xgoal:
@@ -39,7 +44,8 @@ def main(xa, Xobs):
 
             T.traj = [T.root]  # On reset le chemin à chaque changement d'objectif
 
-        print("Temps actuel :", time() - beginExecutionTime)
+        print("Temps actuel :", time() - beginExecutionTime, "Chemin trouvé : ", T.goal_reached()[0])
+        print("Position : ", T.xa)
         print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
         print("Nombre de noeuds : " + str(len(T.Vt)))
 
@@ -73,17 +79,21 @@ def main(xa, Xobs):
 
             toGo = T.traj[1]
             # modif du csv
+            with open("py_to_m.csv", "w") as file:
+                file.write(f"{toGo.x}\n{toGo.y}\n{toGo.z}\n{0}")
 
         previousTraj = list(T.traj)
 
         # code de test
-        velocity = 4
+        """velocity = 4
         if toGo is not None:
             coordinatesXa = np.array([T.xa.x, T.xa.y, T.xa.z])
             coordinatesX1 = np.array([toGo.x, toGo.y, toGo.z])
             if norme(T.xa, toGo) != 0:
                 coordinatesNewXa = (coordinatesX1 - coordinatesXa) / norme(T.xa, toGo) * min(velocity, norme(T.xa, toGo)) + coordinatesXa
-                T.xa = Noeud(coordinatesNewXa[0], coordinatesNewXa[1], coordinatesNewXa[2])
+                T.xa = Noeud(coordinatesNewXa[0], coordinatesNewXa[1], coordinatesNewXa[2])"""
+
+
 
         listDronePositions.append(T.xa)
         listTraj.append(T.traj)
