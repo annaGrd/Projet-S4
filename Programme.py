@@ -45,7 +45,8 @@ def main(xa, Xobs):
             T.traj = [T.root]  # On reset le chemin à chaque changement d'objectif
 
         print("Temps actuel :", time() - beginExecutionTime, "Chemin trouvé : ", T.goal_reached()[0])
-        print("Position : ", T.xa)
+        if len(T.traj) > 1:
+            print("Position : ", T.xa, "Prochain point : ", T.traj[1])
         print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
         print("Nombre de noeuds : " + str(len(T.Vt)))
 
@@ -70,17 +71,19 @@ def main(xa, Xobs):
         # Si jamais le drone s'est éloigné de la racine actuelle et que le chemin change, il y a 2 cas
         # - S'il n'y a pas d'obstacles entre le drone et le prochain objectif, il peut y aller
         # - S'il y a un obstacle entre le drone et le prochain objectif, on actualise la racine et on recalcule la trajectoire
-        toGo = None
         if len(T.traj) > 1 and moving:
 
             if not T.traj[1].line(T.xa):
                 T.update_root()
                 T.plan()
 
-            toGo = T.traj[1]
             # modif du csv
             with open("py_to_m.csv", "w") as file:
-                file.write(f"{toGo.x}\n{toGo.y}\n{toGo.z}\n{0}")
+                xValues = ",".join([str(node.x) for node in T.traj])
+                yValues = ",".join([str(node.y) for node in T.traj])
+                zValues = ",".join([str(node.z) for node in T.traj])
+                psiValues = ",".join(["0" for _ in T.traj])
+                file.write(f"{xValues}\n{yValues}\n{zValues}\n{psiValues}")
 
         previousTraj = list(T.traj)
 

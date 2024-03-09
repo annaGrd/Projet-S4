@@ -1,7 +1,7 @@
 function [p_traj, t_traj, coef_traj] = goalToTraj(xa, xgoal, v, w)
     
     tEnd = sqrt((xa(1, 1)-xgoal(1, 1))^2 + (xa(2, 1)-xgoal(2, 1))^2 + (xa(3, 1)-xgoal(3, 1))^2)/v;
-
+    
     tEndangle = abs(xa(4, 1) - xgoal(4, 1))/w;
     
     p_traj = [xa(1, 1), xgoal(1, 1), xa(2, 1), xgoal(2, 1), xa(3, 1), xgoal(3, 1), xa(4, 1), xgoal(4, 1)];

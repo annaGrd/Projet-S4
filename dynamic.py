@@ -106,11 +106,11 @@ def update_goal_and_obstacles(T, t):
     global timeBeforeChange
     global xgoal
 
-    """if t - timeBeforeChange > 10:
+    if t - timeBeforeChange > 100:
         xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
         while not inGrid(xgoal):
             xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
-        timeBeforeChange = t"""
+        timeBeforeChange = t
 
     change_xgoal = (xgoal != T.xgoal)
     T.xgoal = xgoal
