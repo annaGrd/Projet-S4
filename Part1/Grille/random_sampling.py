@@ -1,7 +1,8 @@
-from ref_changes import reference_change
 from random import uniform, randint
 import numpy as np
-from utils_grid import inGrid, norme
+
+from Part1.Grille.ref_changes import reference_change
+from Part1.Grille.utils_grid import inGrid, norme
 from Part1.MainAndClasses.noeud import Noeud
 from Part1.MainAndClasses.constants import X, rs, edge
 

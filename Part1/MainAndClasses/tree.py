@@ -1,12 +1,12 @@
 from time import time
-
-from noeud import Noeud
+from math import pi
 from random import uniform
 import numpy as np
+
+from Part1.MainAndClasses.noeud import Noeud, recalculate_costs
 from Part1.Grille.random_sampling import ellipse_sampling, uniform_sampling, line_sampling
 from Part1.Grille.utils_grid import norme, cells, list_indices_at_range
-from constants import alpha, beta, kmax, rs, vFree, edge, rg, k
-from math import pi
+from Part1.MainAndClasses.constants import alpha, beta, kmax, rs, vFree, edge, rg, k
 
 
 class Tree:
@@ -145,6 +145,7 @@ class Tree:
 
             xr = self.Qr.pop(0)
             Xnear = self.find_nodes_near(xr)
+            node_to_recalculate = list()
 
             for xnear in Xnear:
 
@@ -162,12 +163,13 @@ class Tree:
                         self.remove_link(pa, xnear)
                     xnear.parent = xr
                     xnear.ci = cnew
-                    xnear.recalculate_child_costs()
+                    node_to_recalculate.append(xnear)
 
                     xr.not_seen()
                     xnear.not_seen()
 
                     self.Qr.append(xnear)
+            recalculate_costs(node_to_recalculate)
 
     def rewire_from_root(self):
         # Algo 5
@@ -177,8 +179,10 @@ class Tree:
 
         t = time()
         while time() - t < .1 and self.Qs:
+
             xs = self.Qs.pop(0)
             Xnear = self.find_nodes_near(xs)
+            node_to_recalculate = list()
 
             for xnear in Xnear:
 
@@ -197,7 +201,7 @@ class Tree:
 
                     xnear.parent = xs
                     xnear.ci = cnew
-                    xnear.recalculate_child_costs()
+                    node_to_recalculate.append(xnear)
 
                     xs.not_seen()
                     xnear.not_seen()
@@ -205,6 +209,7 @@ class Tree:
                 if xnear not in self.mem:
                     self.Qs.append(xnear)
                     self.mem.append(xnear)
+            recalculate_costs(node_to_recalculate)
             self.rewire_radius = xs.ci
 
     def find_nodes_near(self, x):

@@ -27,7 +27,7 @@ class Noeud:
     def __repr__(self):
         return f"[{round(self.x,2)}, {round(self.y,2)}, {round(self.z,2)}]"
 
-    def recalculate_child_costs(self, change_of_root=False):
+    def recalculate_child_costs(self, change_of_root=False, memory=None):
 
         """
         L'idée ici, c'est qu'à chaque fois qu'il y a une modification dans les liens entre les noeuds, on calcule
@@ -39,18 +39,22 @@ class Noeud:
         les ci, mais bien le nouvel ordre que l'on veut, d'où la modif de cet algo
         """
 
+        if memory is None:
+            memory = []
         for x in self.childs:
-            if change_of_root:
-                pa = x.parent
-                if pa is not None:
-                    x.childs.append(x.parent)
-                x.parent = self
-                x.childs.remove(self)
+            if x not in memory:
+                memory.append(x)
+                if change_of_root:
+                    pa = x.parent
+                    if pa is not None:
+                        x.childs.append(x.parent)
+                    x.parent = self
+                    x.childs.remove(self)
 
-            potentialNewCost = self.ci + norme(x, self)
-            if potentialNewCost != x.ci:
-                x.ci = potentialNewCost
-                x.recalculate_child_costs(change_of_root=change_of_root)
+                potentialNewCost = self.ci + norme(x, self)
+                if potentialNewCost != x.ci:
+                    x.ci = potentialNewCost
+                    x.recalculate_child_costs(change_of_root=change_of_root, memory=memory)
 
     def fc(self, xgoal):
         """
@@ -107,3 +111,9 @@ class Noeud:
         pa = self.parent
         if pa is not None:
             pa.not_seen()
+
+
+def recalculate_costs(node_to_recalculate, change_of_root=False):
+    memory = list()
+    for x in node_to_recalculate:
+        x.recalculate_child_costs(change_of_root=change_of_root, memory=memory)

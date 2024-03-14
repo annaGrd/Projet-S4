@@ -5,9 +5,9 @@ import numpy as np
 
 from Part1.Dynamique.dynamic import update_goal_and_obstacles, update_block
 from Part1.Dynamique.dynamic_obstacles import get_dynamic_obstacles
-from tree import Tree
-from noeud import Noeud
-from constants import rprox, update_time
+from Part1.MainAndClasses.tree import Tree
+from Part1.MainAndClasses.noeud import Noeud
+from Part1.MainAndClasses.constants import rprox, update_time
 from Part1.Grille.utils_grid import norme
 
 

@@ -3,6 +3,7 @@ from math import sqrt
 from Part1.MainAndClasses.constants import Xobs, edge, X, safety_radius
 from Part1.Dynamique.dynamic_obstacles import get_dynamic_obstacles
 
+
 def norme(x1, x2):
     x = x1.x - x2.x
     y = x1.y - x2.y

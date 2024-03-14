@@ -12,6 +12,7 @@ xa = Noeud()
 
 listDronePositions, listTraj, listXgoal, listDynamicObstacles, listNodes, listLinks = main(xa, [])
 
+
 def update_fig(i):
     artists = []
     ax.clear()

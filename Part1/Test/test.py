@@ -1,14 +1,15 @@
-from Part1.MainAndClasses.tree import Tree
-from Part1.MainAndClasses.noeud import Noeud
+from random import randint
 from time import time
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+
+from Part1.MainAndClasses.tree import Tree
+from Part1.MainAndClasses.noeud import Noeud
 from Part1.MainAndClasses.constants import Xobs, X
 from Part1.Grille.utils_grid import norme
-from random import randint
 
-animate = True  # Anime tout le procede de l'algo
-render = True  # Affiche les obstacles, la trajectoire trouvee le point de depart et le point d'arrivee
+animate = True  # Anime tout le procédé de l'algo
+render = True  # Affiche les obstacles, la trajectoire trouvée le point de depart et le point d'arrivée
 
 fig = plt.figure()
 ax = fig.add_subplot(projection="3d")
