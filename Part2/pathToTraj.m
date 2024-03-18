@@ -4,15 +4,18 @@
 %xa = [0;0;0;0];
 %traj = pathToTraj_(xa, path, v, w);
 
-function [traj, tStart] = pathToTraj(xa, path, v, w, traveledPath, speed)
-    nbPoints = length(path(1, :));
-    nbPointsTraveled = length(traveledPath(1, :));
+function [traj, tStart] = pathToTraj(xa, path, v, w, pathTraveled, speed)
     
     points = path;
     points(:, 1) = xa;
-
-    pointsTraveled = traveledPath;
+    nbPoints = length(points(1, :));
     
+    pointsTraveled = pathTraveled;
+    nbPointsTraveled = length(pointsTraveled(1, :));
+
+    points
+    pointsTraveled
+
     timeValuesTraveled = zeros(1, nbPointsTraveled);
     t = 0;
 
@@ -22,9 +25,11 @@ function [traj, tStart] = pathToTraj(xa, path, v, w, traveledPath, speed)
         t = t + max(travelTime, rotationTime);
         timeValuesTraveled(i) = t;
     end
-
+    
     tStart = t;
-    timeValues = zeros(1, nbPointsTraveled);
+    timeValues = zeros(1, nbPoints);
+    timeValues(1) = tStart;
+    speed
 
     for i = 2:nbPoints
         travelTime = sqrt((points(1, i) - points(1, i-1))^2 + (points(2, i) - points(2, i-1))^2 + (points(3, i) - points(3, i-1))^2)/v;
@@ -32,21 +37,22 @@ function [traj, tStart] = pathToTraj(xa, path, v, w, traveledPath, speed)
         t = t + max(travelTime, rotationTime);
         timeValues(i) = t;
     end
-    
+
     if nbPoints == 1
         points = [xa, xa];
-        timeValues = [0, 1];
+        timeValues = [tStart, tStart + 1];
     end
 
     %Interpolation avec des cubic splines
-    tt = timeValues(1):.1:timeValues(length(timeValues));
+
+    tt = timeValues(1):.05:timeValues(length(timeValues));
     xx = spline(timeValues, [speed(1) points(1, :) 0], tt);
     yy = spline(timeValues, [speed(2) points(2, :) 0], tt);
     zz = spline(timeValues, [speed(3) points(3, :) 0], tt);
     psi = spline(timeValues, [0 points(4, :) 0], tt);
-
-    if length(pointsTraveled(1, :)) > 1
-        ttTraveled = 0:.1:timeValuesTraveled(length(timeValuesTraveled));
+    
+    if nbPointsTraveled > 1
+        ttTraveled = 0:.05:timeValuesTraveled(length(timeValuesTraveled));
         xxTraveled = spline(timeValuesTraveled, [0 pointsTraveled(1, :) speed(1)], ttTraveled);
         yyTraveled = spline(timeValuesTraveled, [0 pointsTraveled(2, :) speed(2)], ttTraveled);
         zzTraveled = spline(timeValuesTraveled, [0 pointsTraveled(3, :) speed(3)], ttTraveled);
@@ -58,12 +64,12 @@ function [traj, tStart] = pathToTraj(xa, path, v, w, traveledPath, speed)
         zz = cat(2, zzTraveled, zz);
         psi = cat(2, psiTraveled, psi);
     end
-
     
 
     timeValues = tt;
     points = [xx;yy;zz;psi];
 
     traj = timeseries(points, timeValues);
-    
+
+
 end
