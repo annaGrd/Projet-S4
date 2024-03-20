@@ -12,6 +12,10 @@ delta = .5;
 
 tGlobal = time();
 
+tSpeed = timeseries([0;0;0], 0);
+tDistance = timeseries(0, 0);
+tpos = timeseries([0;0;0;0], 0);
+
 [traj, tStart] = pathToTraj(xa, path, v, w, pathTraveled, speed);
 tsOut = sim("PIDF_avec_xy_pour_algo2.slx").tsOut;
 tLastSim = time();
@@ -73,23 +77,28 @@ while time() - tGlobal < 300
 
     actualTime = time() - tLastSim;
     
-    if distanceToEndPath > .5
+    if actualTime < tsOut.Time(length(tsOut.Time))
         posList = getsampleusingtime(tsOut, actualTime - delta, actualTime + delta);
         pos = posList.Data(:, :, fix(length(posList.Data(1, 1, :))/2));
-        % Vu qu'on a décalé l'origine, il faut réajuster avant d'envoyer
-        % dans le csv
-        xa = [pos(1:3);pos(6)] + xorigin;
-        speed = pos(4:6);
-        
-        %if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), path(:, 2)) && sqrt((xa(1) - path(1, 2))^2 + (xa(2) - path(2, 2))^2 + (xa(3) - path(3, 2))^2) < .5
-        %    pathTraveled = cat(2, pathTraveled, path(:, 2));
-        %end
-
-        writematrix(pos(1:6) + [xorigin(1:3);0;0;xorigin(4)], "../Passerelle1-2/m_to_py.csv");
     else
-        speed = [0;0;0];
+        pos = posList.Data(:, :, length(posList.Data(1, 1, :)));
     end
 
+    % Vu qu'on a décalé l'origine, il faut réajuster avant d'envoyer
+    % dans le csv
+    xa = [pos(1:3);pos(6)] + xorigin;
+    speed = pos(4:6);
+    
+    %if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), path(:, 2)) && sqrt((xa(1) - path(1, 2))^2 + (xa(2) - path(2, 2))^2 + (xa(3) - path(3, 2))^2) < .5
+    %    pathTraveled = cat(2, pathTraveled, path(:, 2));
+    %end
+
+    writematrix(pos(1:6) + [xorigin(1:3);0;0;xorigin(4)], "../Passerelle1-2/m_to_py.csv");
+
+    at = time() - tGlobal;
+    tpos = addsample(tpos, "Data", xa, "Time", at);
+    tDistance = addsample(tDistance, "Data", distanceToEndPath, "Time", at);
+    tSpeed = addsample(tSpeed, "Data", speed, "Time", at);
 end
 
 
