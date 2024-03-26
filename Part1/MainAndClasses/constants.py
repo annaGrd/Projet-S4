@@ -1,9 +1,9 @@
 import numpy as np
 
 # Généralités
-X = np.array([[0, 30], [0, 30], [0, 2]])  # taille de grille
+X = np.array([[0, 30], [0, 30], [0, 30]])  # taille de grille
 
-Xobs = np.array([[[0, 25], [8, 10], [0, 2]], [[5, 30], [18, 20], [0, 2]]])  # liste des obstacles
+Xobs = np.array([[[0, 25], [8, 10], [0, 25]], [[5, 30], [18, 20], [0, 25]]])  # liste des obstacles
 vObs = 0  # Volume occupé par les obstacles
 k = 100 # nombre de points max dans la trajectoire
 

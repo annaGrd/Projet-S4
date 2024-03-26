@@ -1,8 +1,7 @@
 from time import time
-from math import pi
+from math import pi, acos, inf
 from random import uniform
 import numpy as np
-
 from Part1.MainAndClasses.noeud import Noeud, recalculate_costs
 from Part1.Grille.random_sampling import ellipse_sampling, uniform_sampling, line_sampling
 from Part1.Grille.utils_grid import norme, cells, list_indices_at_range
@@ -307,6 +306,7 @@ class Tree:
                 path.insert(0, xclosest)
             self.traj = path[1:]
             self.opti_traj(0, [], False)
+            self.opti_curve()
             return True
         else:
             path = [self.root]
@@ -372,6 +372,45 @@ class Tree:
                 new_traj.append(self.traj[-1])
             self.traj = new_traj
             return True
+
+    def opti_curve(self):
+        segmented_traj = [[self.traj[i//2]] if i % 2 == 0 else list() for i in range(2*len(self.traj)-1)]
+        new_traj = list()
+        previous_angle = inf  # angle pour le noeud d'avant
+        for indice in range(1, len(self.traj)-1):
+            node = np.array([self.traj[indice].x, self.traj[indice].y, self.traj[indice].z])
+            previous_node = np.array([self.traj[indice-1].x, self.traj[indice-1].y, self.traj[indice-1].z])
+            next_node = np.array([self.traj[indice+1].x, self.traj[indice+1].y, self.traj[indice+1].z])
+            previous_norm = norme(self.traj[indice-1], self.traj[indice])
+            next_norm = norme(self.traj[indice+1], self.traj[indice])
+            v1 = previous_node-node
+            v2 = next_node-node
+            dot_product = v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2]
+            angle = acos(dot_product/(previous_norm * next_norm))
+            if abs(angle) < 2*pi/3:
+                weighting1 = int(3*previous_norm / rs * (1 - angle / (2 * pi / 3)))
+                weighting2 = int(3*next_norm / rs * (1 - angle / (2 * pi / 3)))
+                print("weighting1", weighting1, "weighting2", weighting2)
+                if abs(angle) < abs(previous_angle):
+                    nodes_to_add = list()
+                    for num_of_node in range(1, weighting1+1):
+                        print()
+                        node_to_be_added = (1 - num_of_node/(weighting1+1)) * previous_node + num_of_node/(weighting1+1) * node
+                        nodes_to_add.append(Noeud(node_to_be_added[0], node_to_be_added[1], node_to_be_added[2]))
+                    segmented_traj[2*indice-1] = nodes_to_add
+                nodes_to_add = list()
+                for num_of_node in range(1, weighting2+1):
+                    node_to_be_added = (1 - num_of_node/(weighting2+1)) * node + num_of_node/(weighting2+1) * next_node
+                    nodes_to_add.append(Noeud(node_to_be_added[0], node_to_be_added[1], node_to_be_added[2]))
+                segmented_traj[2*indice+1] = nodes_to_add
+            previous_angle = angle
+        for segment in segmented_traj:
+            new_traj.extend(segment)
+        if not segmented_traj:
+            segmented_traj.append(self.traj[-1])
+        print(f"avant: {self.traj}")
+        print(f"apres: {new_traj}")
+        self.traj = new_traj
 
     def update_root(self, newRoot=None):
         if newRoot is None:
