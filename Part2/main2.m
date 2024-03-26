@@ -12,22 +12,20 @@ delta = .5;
 
 tGlobal = time();
 
+tSpeed = timeseries([0;0;0], 0);
+tDistance = timeseries(0, 0);
+tpos = timeseries([0;0;0;0], 0);
+
 [traj, tStart] = pathToTraj(xa, path, v, w, pathTraveled, speed);
 tsOut = sim("PIDF_avec_xy_pour_algo2.slx").tsOut;
 tLastSim = time();
 
 while time() - tGlobal < 300
 
-    path = readmatrix("py_to_m.csv");
+    path = readmatrix("../Passerelle1-2/py_to_m.csv");
     
     while isempty(path)
-        path = readmatrix("py_to_m.csv");
-    end
-    
-    for i = 1:length(path(1, :))
-        if isequal(path(:, i), [NaN;NaN;NaN;NaN])
-            path
-        end
+        path = readmatrix("../Passerelle1-2/py_to_m.csv");
     end
 
     distanceToEndPath = sqrt((path(1, length(path(1, :))) - xa(1))^2 + (path(2, length(path(1, :))) - xa(2))^2 + (path(3, length(path(1, :))) - xa(3))^2);
@@ -38,13 +36,23 @@ while time() - tGlobal < 300
     %De plus si on atteint l'objectif, on ne refait jamais la simu
     if ((~isIn(path, pathBefore)) | (time() - tLastSim > tsOut.Time(length(tsOut.Time)))) & ( distanceToEndPath > .5)
         disp("Simulation begining")
-        path
-        
+        t = time();
+        %if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), xa)
+        %    pathTraveled = cat(2, pathTraveled, xa + xorigin);
+        %end
+
         % Le régulateur conserve des résultats cohérents autour de son
         % point d'équilibre, donc pour avoir des résultats corrects
         % partout, il faut décaler l'origine du repère en la position
         % actuelle du drone
-        xorigin = xa;
+        
+        if isequal(speed, [0;0;0])
+            pathTraveled = xa;
+        else
+            pathTraveled = [xa - [5*speed/sqrt(speed(1)^2 + speed(2)^2 + speed(3)^2);0],xa];
+        end
+        
+        xorigin = pathTraveled(:, 1);
         pathDisplacement = zeros(4, length(path(1, :)));
         pathTraveledDisplacement = zeros(4, length(pathTraveled(1, :)));
 
@@ -56,11 +64,11 @@ while time() - tGlobal < 300
             pathTraveledDisplacement(:, i) = xorigin;
         end
 
-        [traj, tStart] = pathToTraj([0;0;0;0], path - pathDisplacement, v, w, pathTraveled - pathTraveledDisplacement, speed);
+        [traj, tStart] = pathToTraj(xa - xorigin, path - pathDisplacement, v, w, pathTraveled - pathTraveledDisplacement, speed);
         
 
-        tsOut = sim("PIDF_avec_xy_pour_algo2.slx").tsOut;
-        tLastSim = time() - tStart;
+        tsOut = sim("PIDF_avec_xy_pour_algo2.slx", "StopTime", num2str(traj.Time(length(traj.Time)))).tsOut;
+        tLastSim = t - tStart;
         
         pathBefore = path;
         disp("Simulation done !")
@@ -69,22 +77,28 @@ while time() - tGlobal < 300
 
     actualTime = time() - tLastSim;
     
-    if distanceToEndPath > .5
+    if actualTime < tsOut.Time(length(tsOut.Time))
         posList = getsampleusingtime(tsOut, actualTime - delta, actualTime + delta);
         pos = posList.Data(:, :, fix(length(posList.Data(1, 1, :))/2));
-        % Vu qu'on a décalé l'origine, il faut réajuster avant d'envoyer
-        % dans le csv
-        xa = [pos(1:3);pos(6)] + xorigin;
-        speed = pos(4:6);
-        
-        if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), path(:, 2)) && sqrt((xa(1) - path(1, 2))^2 + (xa(2) - path(2, 2))^2 + (xa(3) - path(3, 2))^2) < .5
-            pathTraveled = cat(2, pathTraveled, path(:, 2));
-        end
-
-        writematrix(pos(1:6) + [xorigin(1:3);0;0;xorigin(4)], "m_to_py.csv");
     else
-        pathTraveled = [0;0;0;0];
+        pos = posList.Data(:, :, length(posList.Data(1, 1, :)));
     end
+
+    % Vu qu'on a décalé l'origine, il faut réajuster avant d'envoyer
+    % dans le csv
+    xa = [pos(1:3);pos(6)] + xorigin;
+    speed = pos(4:6);
+    
+    %if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), path(:, 2)) && sqrt((xa(1) - path(1, 2))^2 + (xa(2) - path(2, 2))^2 + (xa(3) - path(3, 2))^2) < .5
+    %    pathTraveled = cat(2, pathTraveled, path(:, 2));
+    %end
+
+    writematrix(pos(1:6) + [xorigin(1:3);0;0;xorigin(4)], "../Passerelle1-2/m_to_py.csv");
+
+    at = time() - tGlobal;
+    tpos = addsample(tpos, "Data", xa, "Time", at);
+    tDistance = addsample(tDistance, "Data", distanceToEndPath, "Time", at);
+    tSpeed = addsample(tSpeed, "Data", speed, "Time", at);
 end
 
 
