@@ -4,72 +4,56 @@
 %xa = [0;0;0;0];
 %traj = pathToTraj_(xa, path, v, w);
 
-function [traj, tStart] = pathToTraj(xa, path, v, w, pathTraveled, speed)
-    
+function [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed)
+        
+    acceleration_duration = 5;
     points = path;
     points(:, 1) = xa;
-    nbPoints = length(points(1, :));
+    if length(points(1, :)) == 1
+        points = [[0;0;0;0], [0;0;0;0]];
+        timeValues = [0, 10];
+        traj = timeseries(points, timeValues);
+        xorigin = points(:, 1);
+        tStart = 0;
+    else
+
+        timeValues = zeros(1, length(points(1, :)));
+        tStart = 0;
     
-    pointsTraveled = pathTraveled;
-    nbPointsTraveled = length(pointsTraveled(1, :));
+        index_start = 1;
+        if ~isequal(speed, [0;0;0;0])
+            beginPoint = points(:, 1) - [acceleration_duration*speed(1:3)/distance_column_vectors(speed(1:3), [0;0;0]); 0];
+            points = [beginPoint, points];
+            timeValues = [0, timeValues];
+            timeValues(2) = acceleration_duration;
+            tStart = acceleration_duration;
+            index_start = 2;
+        end
+        
+        points
 
-    points
-    pointsTraveled
-
-    timeValuesTraveled = zeros(1, nbPointsTraveled);
-    t = 0;
-
-    for i = 2:nbPointsTraveled
-        travelTime = sqrt((pointsTraveled(1, i) - pointsTraveled(1, i-1))^2 + (pointsTraveled(2, i) - pointsTraveled(2, i-1))^2 + (pointsTraveled(3, i) - pointsTraveled(3, i-1))^2)/v;
-        rotationTime = abs(pointsTraveled(4, i) - pointsTraveled(4, i-1))/w;
-        t = t + max(travelTime, rotationTime);
-        timeValuesTraveled(i) = t;
-    end
+        xorigin = points(:, 1);
+        points = points - xorigin;
     
-    tStart = t;
-    timeValues = zeros(1, nbPoints);
-    timeValues(1) = tStart;
-    speed
+        for j = index_start+1:length(timeValues)
+            translation_time = distance_column_vectors(points(1:3, j), points(1:3, j-1))/v;
+            rotation_time = abs(points(4, j) - points(4, j-1))/w;
+            timeValues(j) = timeValues(j-1) + max(translation_time, rotation_time);
+        end
 
-    for i = 2:nbPoints
-        travelTime = sqrt((points(1, i) - points(1, i-1))^2 + (points(2, i) - points(2, i-1))^2 + (points(3, i) - points(3, i-1))^2)/v;
-        rotationTime = abs(points(4, i) - points(4, i-1))/w;
-        t = t + max(travelTime, rotationTime);
-        timeValues(i) = t;
-    end
+        timeValues
+        
+        [xx, newtimeValues] = interpolate(timeValues, points(1, :), tStart, speed(1));
+        [yy, ~] = interpolate(timeValues, points(2, :), tStart, speed(2));
+        [zz, ~] = interpolate(timeValues, points(3, :), tStart, speed(3));
+        [psi, ~] = interpolate(timeValues, points(4, :), tStart, speed(4));
 
-    if nbPoints == 1
-        points = [xa, xa];
-        timeValues = [tStart, tStart + 1];
-    end
-
-    %Interpolation avec des cubic splines
-
-    tt = timeValues(1):.05:timeValues(length(timeValues));
-    xx = spline(timeValues, [speed(1) points(1, :) 0], tt);
-    yy = spline(timeValues, [speed(2) points(2, :) 0], tt);
-    zz = spline(timeValues, [speed(3) points(3, :) 0], tt);
-    psi = spline(timeValues, [0 points(4, :) 0], tt);
+        points = [xx;yy;zz;psi];
     
-    if nbPointsTraveled > 1
-        ttTraveled = 0:.05:timeValuesTraveled(length(timeValuesTraveled));
-        xxTraveled = spline(timeValuesTraveled, [0 pointsTraveled(1, :) speed(1)], ttTraveled);
-        yyTraveled = spline(timeValuesTraveled, [0 pointsTraveled(2, :) speed(2)], ttTraveled);
-        zzTraveled = spline(timeValuesTraveled, [0 pointsTraveled(3, :) speed(3)], ttTraveled);
-        psiTraveled = spline(timeValuesTraveled, [0 pointsTraveled(4, :) 0], ttTraveled);
-
-        tt = cat(2, ttTraveled, tt);
-        xx = cat(2, xxTraveled, xx);
-        yy = cat(2, yyTraveled, yy);
-        zz = cat(2, zzTraveled, zz);
-        psi = cat(2, psiTraveled, psi);
+        traj = timeseries(points, newtimeValues);
     end
-    
+end
 
-    timeValues = tt;
-    points = [xx;yy;zz;psi];
-
-    traj = timeseries(points, timeValues);
-
-
+function value = distance_column_vectors(A, B)
+    value = sqrt((A(1)-B(1))^2 + (A(2)-B(2))^2 + (A(3)-B(3))^2);
 end

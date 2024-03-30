@@ -1,27 +1,27 @@
 warning("off", "all")
 
 xa = [0;0;0;0];
-speed = [0;0;0];
+speed = [0;0;0;0];
 pathBefore = [0;0;0;0];
 path = [0;0;0;0];
 pathTraveled = [0;0;0;0];
-xorigin = xa;
 v = 1;
 w = pi/180;
-delta = .5;
+delta = .1;
 
 tGlobal = time();
 
 tSpeed = timeseries([0;0;0], 0);
 tDistance = timeseries(0, 0);
 tpos = timeseries([0;0;0;0], 0);
+tAngles = timeseries([0;0;0], 0);
 
-[traj, tStart] = pathToTraj(xa, path, v, w, pathTraveled, speed);
-tsOut = sim("PIDF_avec_xy_pour_algo2.slx").tsOut;
+[traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed);
+tsOut = sim("PIDF_avec_xy_pour_algo2.slx", "StopTime", "10").tsOut;
 tLastSim = time();
+t = time();
 
 while time() - tGlobal < 300
-
     path = readmatrix("../Passerelle1-2/py_to_m.csv");
     
     while isempty(path)
@@ -36,7 +36,6 @@ while time() - tGlobal < 300
     %De plus si on atteint l'objectif, on ne refait jamais la simu
     if ((~isIn(path, pathBefore)) | (time() - tLastSim > tsOut.Time(length(tsOut.Time)))) & ( distanceToEndPath > .5)
         disp("Simulation begining")
-        t = time();
         %if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), xa)
         %    pathTraveled = cat(2, pathTraveled, xa + xorigin);
         %end
@@ -45,29 +44,28 @@ while time() - tGlobal < 300
         % point d'équilibre, donc pour avoir des résultats corrects
         % partout, il faut décaler l'origine du repère en la position
         % actuelle du drone
+           
+        grad = gradient(squeeze(traj.Data));
+        tsSpeed = timeseries(grad, traj.Time);
         
-        if isequal(speed, [0;0;0])
-            pathTraveled = xa;
+        actualTime = time() - tLastSim;
+        t = time();
+        speedList = getsampleusingtime(tsSpeed, actualTime - delta, actualTime + delta);
+        if isequal(speedList.Data, [])
+            speed = [0;0;0;0];
+        elseif length(speedList.Data(1, 1, :)) == 1
+            speed = speedList.Data(:, 1, 1);
+        elseif actualTime < tsOut.Time(length(tsOut.Time))
+            speed = speedList.Data(:, :, fix(length(speedList.Data(1, 1, :))/2));
         else
-            pathTraveled = [xa - [5*speed/sqrt(speed(1)^2 + speed(2)^2 + speed(3)^2);0],xa];
-        end
+            speed = speedList.Data(:, :, length(speedList.Data(1, 1, :)));
+        end     
+         
+        [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, [realSpeed; speed(4)]);
         
-        xorigin = pathTraveled(:, 1);
-        pathDisplacement = zeros(4, length(path(1, :)));
-        pathTraveledDisplacement = zeros(4, length(pathTraveled(1, :)));
+        simTime = min(10, traj.Time(length(traj.Time)));
 
-        for i = 1:length(path(1, :))
-            pathDisplacement(:, i) = xorigin;
-        end
-
-        for i = 1:length(pathTraveled(1, :))
-            pathTraveledDisplacement(:, i) = xorigin;
-        end
-
-        [traj, tStart] = pathToTraj(xa - xorigin, path - pathDisplacement, v, w, pathTraveled - pathTraveledDisplacement, speed);
-        
-
-        tsOut = sim("PIDF_avec_xy_pour_algo2.slx", "StopTime", num2str(traj.Time(length(traj.Time)))).tsOut;
+        tsOut = sim("PIDF_avec_xy_pour_algo2.slx", "StopTime", num2str(simTime)).tsOut;
         tLastSim = t - tStart;
         
         pathBefore = path;
@@ -87,7 +85,7 @@ while time() - tGlobal < 300
     % Vu qu'on a décalé l'origine, il faut réajuster avant d'envoyer
     % dans le csv
     xa = [pos(1:3);pos(6)] + xorigin;
-    speed = pos(4:6);
+    realSpeed = pos(7:9);
     
     %if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), path(:, 2)) && sqrt((xa(1) - path(1, 2))^2 + (xa(2) - path(2, 2))^2 + (xa(3) - path(3, 2))^2) < .5
     %    pathTraveled = cat(2, pathTraveled, path(:, 2));
@@ -98,7 +96,8 @@ while time() - tGlobal < 300
     at = time() - tGlobal;
     tpos = addsample(tpos, "Data", xa, "Time", at);
     tDistance = addsample(tDistance, "Data", distanceToEndPath, "Time", at);
-    tSpeed = addsample(tSpeed, "Data", speed, "Time", at);
+    tSpeed = addsample(tSpeed, "Data", realSpeed, "Time", at);
+    tAngles = addsample(tAngles, "Data", pos(4:6), "Time", at);
 end
 
 
