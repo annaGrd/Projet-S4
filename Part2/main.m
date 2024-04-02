@@ -1,48 +1,88 @@
 warning("off", "all")
 
 xa = [0;0;0;0];
-xgoalBefore = [0;0;0;0];
-xgoal = [0;0;0;0];
-xorigin = xa;
+speed = [0;0;0;0];
+pathBefore = [0;0;0;0];
+path = [0;0;0;0];
+pathTraveled = [0;0;0;0];
 v = 1;
 w = pi/180;
-delta = .5;
+delta = .1;
 
 tGlobal = time();
 
-[p_traj, t_traj, coef_traj] = goalToTraj(xa, xgoal, v, w);
-tsOut = sim("PIDF_avec_xy_pour_algo.slx").tsOut;
-tLastSim = time();
+tSpeed = timeseries([0;0;0;0], 0);
+tDistance = timeseries(0, 0);
+tpos = timeseries([0;0;0;0], 0);
+tAngles = timeseries([0;0;0], 0);
 
-while time() - tGlobal < 120
-    xgoal = readmatrix("py_to_m.csv");
+[traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed);
+tsOut = sim("PIDF_avec_xy_pour_algo.slx", "StopTime", "10").tsOut;
+tLastSim = time();
+t = time();
+
+while time() - tGlobal < 300
+    path = readmatrix("../Passerelle1-2/py_to_m.csv");
     
-    while isempty(xgoal)
-        xgoal = readmatrix("py_to_m.csv");
+    while isempty(path)
+        path = readmatrix("../Passerelle1-2/py_to_m.csv");
     end
 
-    if ((~isequal(xgoal, xgoalBefore)) | (time() - tLastSim > 20)) & (sqrt((xgoal(1) - xa(1))^2 + (xgoal(2) - xa(2))^2 + (xgoal(3) - xa(3))^2) > .5)
+    distanceToEndPath = sqrt((path(1, length(path(1, :))) - xa(1))^2 + (path(2, length(path(1, :))) - xa(2))^2 + (path(3, length(path(1, :))) - xa(3))^2);
+    
+    %2 cas possibles pour lesquels on voudrait refaire une simu:
+    %- Si le chemin a changé (sauf si c'est parce qu'on avance dessus)
+    %- Si on arrive à la fin de la trajectoire prédite (ça arrive rarement)
+    %De plus si on atteint l'objectif, on ne refait jamais la simu
+    if ((~isIn(path, pathBefore)) | (time() - tLastSim > tsOut.Time(length(tsOut.Time)))) & ( distanceToEndPath > .5)
         disp("Simulation begining")
-        xgoal
-        xorigin = xa;
-        [p_traj, t_traj, coef_traj] = goalToTraj([0;0;0;0], xgoal - xorigin, v, w);
+        %if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), xa)
+        %    pathTraveled = cat(2, pathTraveled, xa + xorigin);
+        %end
+
+        % Le régulateur conserve des résultats cohérents autour de son
+        % point d'équilibre, donc pour avoir des résultats corrects
+        % partout, il faut décaler l'origine du repère en la position
+        % actuelle du drone   
+        [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed);
         
+        simTime = min(10, traj.Time(length(traj.Time)));
+
+        tsOut = sim("PIDF_avec_xy_pour_algo.slx", "StopTime", num2str(simTime)).tsOut;
+        tLastSim = t - tStart;
         
-        tsOut = sim("PIDF_avec_xy_pour_algo.slx").tsOut;
-        tLastSim = time();
-        
-        xgoalBefore = xgoal;
+        pathBefore = path;
         disp("Simulation done !")
         disp("")
     end
+
     actualTime = time() - tLastSim;
     
-    if actualTime < 10
+    if actualTime < tsOut.Time(length(tsOut.Time))
         posList = getsampleusingtime(tsOut, actualTime - delta, actualTime + delta);
         pos = posList.Data(:, :, fix(length(posList.Data(1, 1, :))/2));
-        xa = [pos(1);pos(2);pos(3);pos(6)] + xorigin;
-        writematrix(pos + [xorigin(1); xorigin(2); xorigin(3); 0; 0; xorigin(4)], "m_to_py.csv");
+    else
+        pos = posList.Data(:, :, length(posList.Data(1, 1, :)));
     end
+
+    % Vu qu'on a décalé l'origine, il faut réajuster avant d'envoyer
+    % dans le csv
+    t = time();
+
+    xa = [pos(1:3);pos(6)] + xorigin;
+    speed = pos(7:10);
+    
+    %if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), path(:, 2)) && sqrt((xa(1) - path(1, 2))^2 + (xa(2) - path(2, 2))^2 + (xa(3) - path(3, 2))^2) < .5
+    %    pathTraveled = cat(2, pathTraveled, path(:, 2));
+    %end
+
+    writematrix(pos(1:6) + [xorigin(1:3);0;0;xorigin(4)], "../Passerelle1-2/m_to_py.csv");
+
+    at = time() - tGlobal;
+    tpos = addsample(tpos, "Data", xa, "Time", at);
+    tDistance = addsample(tDistance, "Data", distanceToEndPath, "Time", at);
+    tSpeed = addsample(tSpeed, "Data", speed, "Time", at);
+    tAngles = addsample(tAngles, "Data", pos(4:6), "Time", at);
 end
 
 
