@@ -4,7 +4,6 @@ xa = [0;0;0;0];
 speed = [0;0;0;0];
 pathBefore = [0;0;0;0];
 path = [0;0;0;0];
-pathTraveled = [0;0;0;0];
 v = 1;
 w = pi/180;
 delta = .1;
@@ -34,7 +33,7 @@ while time() - tGlobal < 300
     %- Si le chemin a changé (sauf si c'est parce qu'on avance dessus)
     %- Si on arrive à la fin de la trajectoire prédite (ça arrive rarement)
     %De plus si on atteint l'objectif, on ne refait jamais la simu
-    if ((~isIn(path, pathBefore)) | (time() - tLastSim > tsOut.Time(length(tsOut.Time)))) & ( distanceToEndPath > .5)
+    if ((~isequal(path, pathBefore)) | (time() - tLastSim > tsOut.Time(length(tsOut.Time)))) & ( distanceToEndPath > .5)
         disp("Simulation begining")
         %if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), xa)
         %    pathTraveled = cat(2, pathTraveled, xa + xorigin);

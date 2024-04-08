@@ -18,7 +18,7 @@ function [y_interpolated, x_interpolated] = interpolate(x, y, x_cond_derivative,
             [a, b, c, d] = coef_first_polyn(x(1), y(1), x(2), y(2), y_cond_derivative);
             x_interpolated = x(1):step:x(2);
             y_interpolated = a*x_interpolated.^3 + b*x_interpolated.^2 + c*x_interpolated + d;
-            dx0 = 3*a*x(2)^2 + 2*b*x(2) + c;
+            dx0 = y_cond_derivative;
         end
         
         % Courbes intermediaires

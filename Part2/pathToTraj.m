@@ -29,7 +29,7 @@ function [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed)
             tStart = acceleration_duration;
             index_start = 2;
         end
-        
+
         points
 
         xorigin = points(:, 1);
@@ -43,6 +43,14 @@ function [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed)
 
         timeValues
         
+        % Il arrive que la position actuelle et le point suivant soient
+        % trop proches et engendre un changement de direction trop soudain
+        % On retire donc un de ces points
+        if length(timeValues) >= index_start + 1 && distance_column_vectors(points(:, index_start + 1), points(:, index_start)) < .5
+            points = [points(:, 1:index_start), points(:, index_start + 2:length(points(1, :)))];
+            timeValues = [timeValues(1:index_start), timeValues(index_start+2: length(timeValues))];
+        end
+
         [xx, newtimeValues] = interpolate(timeValues, points(1, :), tStart, speed(1));
         [yy, ~] = interpolate(timeValues, points(2, :), tStart, speed(2));
         [zz, ~] = interpolate(timeValues, points(3, :), tStart, speed(3));
