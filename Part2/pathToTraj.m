@@ -9,7 +9,7 @@ function [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed)
     acceleration_duration = 5;
     points = path;
     points(:, 1) = xa;
-    if length(points(1, :)) == 1
+    if length(points(1, :)) == 1 % Si le drone ne bouge pas
         points = [[0;0;0;0], [0;0;0;0]];
         timeValues = [0, 10];
         traj = timeseries(points, timeValues);
@@ -21,6 +21,9 @@ function [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed)
         tStart = 0;
     
         index_start = 1;
+        % Si la vitesse de départ est non nulle, il faut prévoir une phase
+        % d'accélération afin de pouvoir donner au régulateur une
+        % trajectoire avec une vitesse de départ nulle
         if ~isequal(speed, [0;0;0;0])
             beginPoint = points(:, 1) - [acceleration_duration*speed(1:3)/distance_column_vectors(speed(1:3), [0;0;0]); 0];
             points = [beginPoint, points];
@@ -31,7 +34,8 @@ function [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed)
         end
 
         points
-
+        
+        % On décale le repère
         xorigin = points(:, 1);
         points = points - xorigin;
     

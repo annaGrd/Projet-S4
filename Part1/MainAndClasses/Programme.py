@@ -88,6 +88,13 @@ def main(xa, Xobs):
                 psiValues = ",".join(["0" for _ in T.traj])
                 file.write(f"{xValues}\n{yValues}\n{zValues}\n{psiValues}")
 
+        with open("Passerelle1-2/dynamic_obstacles.csv", "w") as file:
+            for x, y, z, r in dynamicObstacles:
+                file.write(f"{x},{y},{z},{r}\n")
+
+        with open("Passerelle1-2/goal.csv", "w") as file:
+            file.write(f"{T.xgoal.x},{T.xgoal.y},{T.xgoal.z}")
+
         previousTraj = list(T.traj)
 
         # code de test
