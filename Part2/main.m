@@ -1,4 +1,4 @@
-warning("off", "all")
+    warning("off", "all")
 
 xa = [0;0;0;0];
 speed = [0;0;0;0];
@@ -14,6 +14,7 @@ tSpeed = timeseries([0;0;0;0], 0);
 tDistance = timeseries(0, 0);
 tpos = timeseries([0;0;0;0], 0);
 tAngles = timeseries([0;0;0], 0);
+ts = timeseries([0;0;0], 0);
 
 [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed);
 tsOut = sim("PIDF_avec_xy_pour_algo.slx", "StopTime", "10").tsOut;
@@ -35,9 +36,6 @@ while time() - tGlobal < 300
     %De plus si on atteint l'objectif, on ne refait jamais la simu
     if ((~isequal(path, pathBefore)) | (time() - tLastSim > tsOut.Time(length(tsOut.Time)))) & ( distanceToEndPath > .5)
         disp("Simulation begining")
-        %if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), xa)
-        %    pathTraveled = cat(2, pathTraveled, xa + xorigin);
-        %end
 
         % Le régulateur conserve des résultats cohérents autour de son
         % point d'équilibre, donc pour avoir des résultats corrects
@@ -70,10 +68,6 @@ while time() - tGlobal < 300
 
     xa = [pos(1:3);pos(6)] + xorigin;
     speed = pos(7:10);
-    
-    %if ~isequal(pathTraveled(:, length(pathTraveled(1, :))), path(:, 2)) && sqrt((xa(1) - path(1, 2))^2 + (xa(2) - path(2, 2))^2 + (xa(3) - path(3, 2))^2) < .5
-    %    pathTraveled = cat(2, pathTraveled, path(:, 2));
-    %end
 
     writematrix(pos(1:6) + [xorigin(1:3);0;0;xorigin(4)], "../Passerelle1-2/m_to_py.csv");
 
@@ -82,6 +76,7 @@ while time() - tGlobal < 300
     tDistance = addsample(tDistance, "Data", distanceToEndPath, "Time", at);
     tSpeed = addsample(tSpeed, "Data", speed, "Time", at);
     tAngles = addsample(tAngles, "Data", pos(4:6), "Time", at);
+    ts = addsample(ts, "Data", xa(1:3), "Time", at);
 end
 
 
