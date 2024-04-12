@@ -6,9 +6,10 @@
 
 function [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed)
         
-    acceleration_duration = 5;
+    acceleration_duration = 2;
     points = path;
     points(:, 1) = xa;
+
     if length(points(1, :)) == 1 % Si le drone ne bouge pas
         points = [[0;0;0;0], [0;0;0;0]];
         timeValues = [0, 10];
@@ -25,8 +26,10 @@ function [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed)
         % d'accélération afin de pouvoir donner au régulateur une
         % trajectoire avec une vitesse de départ nulle
         if ~isequal(speed, [0;0;0;0])
-            beginPoint = points(:, 1) - [acceleration_duration*speed(1:3)/distance_column_vectors(speed(1:3), [0;0;0]); 0];
-            points = [beginPoint, points];
+            % La régulation sur psi fait péter un cable au régulateur, on
+            % fait donc l'approximation psi=0
+            beginPoint = points(:, 1) - acceleration_duration*[speed(1:3)/distance_column_vectors(speed(1:3), [0;0;0]); 0];
+            points = [beginPoint, points];  
             timeValues = [0, timeValues];
             timeValues(2) = acceleration_duration;
             tStart = acceleration_duration;
@@ -34,6 +37,7 @@ function [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed)
         end
 
         points
+        speed
         
         % On décale le repère
         xorigin = points(:, 1);
