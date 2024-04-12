@@ -1,11 +1,11 @@
-    warning("off", "all")
+warning("off", "all")
 
 xa = [0;0;0;0];
 speed = [0;0;0;0];
 pathBefore = [0;0;0;0];
 path = [0;0;0;0];
 v = 1;
-w = pi/180;
+w = 2*pi/180;
 delta = .1;
 
 tGlobal = time();
@@ -32,7 +32,7 @@ tLastSim = time();
 t = time();
 
 while time() - tGlobal < 300
-    % On récupère la suite de points par lesquelq passer
+    % On récupère la suite de points par lesquel passer
     path = readmatrix("../Passerelle1-2/py_to_m.csv");
     while isempty(path)
         path = readmatrix("../Passerelle1-2/py_to_m.csv");
