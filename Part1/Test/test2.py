@@ -8,7 +8,7 @@ from Part1.MainAndClasses.noeud import Noeud
 fig = plt.figure()
 ax = fig.add_subplot(projection="3d")
 
-xa = Noeud()
+xa = Noeud(3, 3, 3)
 
 listDronePositions, listTraj, listXgoal, listDynamicObstacles, listNodes, listLinks = main(xa, [])
 
@@ -49,4 +49,4 @@ def update_fig(i):
 
 
 anim = animation.FuncAnimation(fig, update_fig, len(listDronePositions))
-plt.show()
+anim.save("test.gif")

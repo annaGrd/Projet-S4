@@ -16,9 +16,8 @@ import os
 def main(xa, Xobs):
     # Algo 1
     T = Tree([xa], xa)
-    os.chdir("../..")
     with open("Passerelle1-2/m_to_py.csv", "w") as file:
-        file.write(f"{0}\n{0}\n{0}\n{0}\n{0}\n{0}\n")
+        file.write(f"{xa.x}\n{xa.y}\n{xa.z}\n{0}\n{0}\n{0}\n")
 
     # test
     listDronePositions = []
@@ -50,6 +49,7 @@ def main(xa, Xobs):
         print("Temps actuel :", time() - beginExecutionTime, "Chemin trouvé : ", T.goal_reached()[0])
         if len(T.traj) > 1:
             print("Position : ", T.xa, "Prochain point : ", T.traj[1])
+        print("Objectif: ", T.xgoal, "Distance du dernier point à obj: ", norme(T.traj[-1], T.xgoal))
         print("Distance de l'objectif : " + str(norme(T.xa, T.xgoal)))
         print("Nombre de noeuds : " + str(len(T.Vt)))
 

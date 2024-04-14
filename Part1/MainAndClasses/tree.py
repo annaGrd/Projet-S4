@@ -306,7 +306,7 @@ class Tree:
                 path.insert(0, xclosest)
             self.traj = path[1:]
             self.opti_traj(0, [], False)
-            self.opti_curve()
+            #self.opti_curve()
             return True
         else:
             path = [self.root]

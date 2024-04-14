@@ -1,6 +1,6 @@
 warning("off", "all")
 
-xa = [0;0;0;0];
+xa = [3;3;3;0];
 speed = [0;0;0;0];
 pathBefore = [0;0;0;0];
 path = [0;0;0;0];
@@ -11,13 +11,13 @@ delta = .1;
 tGlobal = time();
 
 % Pour du test
-tSpeed = timeseries([0;0;0;0], 0);
+tSpeed = timeseries(speed, 0);
 tDistance = timeseries(0, 0);
-tpos = timeseries([0;0;0;0], 0);
+tpos = timeseries(xa, 0);
 tAngles = timeseries([0;0;0], 0);
 
 % Pour la modélisation
-ts = timeseries([0;0;0], 0);
+ts = timeseries(xa(1:3), 0);
 tGoal = timeseries([0;0;0], 0);
 
 obstacles = readmatrix("../Passerelle1-2/dynamic_obstacles.csv");
@@ -70,7 +70,7 @@ while time() - tGlobal < 300
         [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed);
         
         % On simule sur un petit temps pour que ce soit rapide
-        simTime = min(10, traj.Time(length(traj.Time)));
+        simTime = min(5, traj.Time(length(traj.Time)));
 
         tsOut = sim("PIDF_avec_xy_pour_algo.slx", "StopTime", num2str(simTime)).tsOut;
         tLastSim = t - tStart;

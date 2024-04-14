@@ -2,7 +2,7 @@ from random import randint
 from math import inf
 
 from Part1.MainAndClasses.noeud import Noeud, recalculate_costs
-from Part1.MainAndClasses.constants import update_time, safety_radius, edge, ro
+from Part1.MainAndClasses.constants import update_time, safety_radius, edge, ro, X
 from Part1.Grille.utils_grid import list_indices_at_range, norme, inGrid
 from Part1.Dynamique.dynamic_obstacles import get_dynamic_obstacles
 
@@ -97,9 +97,9 @@ global timeBeforeChange
 timeBeforeChange = 0
 
 global xgoal
-xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
+xgoal = Noeud(randint(X[0, 0], X[0, 1]), randint(X[1, 0], X[1, 1]), randint(X[2, 0], X[2, 1]))
 while not inGrid(xgoal):
-    xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
+    xgoal = Noeud(randint(X[0, 0], X[0, 1]), randint(X[1, 0], X[1, 1]), randint(X[2, 0], X[2, 1]))
 
 
 def update_goal_and_obstacles(T, t):
@@ -113,9 +113,9 @@ def update_goal_and_obstacles(T, t):
     global xgoal
 
     if t - timeBeforeChange > 10:
-        xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
+        xgoal = Noeud(randint(X[0, 0], X[0, 1]), randint(X[1, 0], X[1, 1]), randint(X[2, 0], X[2, 1]))
         while not inGrid(xgoal):
-            xgoal = Noeud(randint(0, 30), randint(0, 30), randint(0, 30))
+            xgoal = Noeud(randint(X[0, 0], X[0, 1]), randint(X[1, 0], X[1, 1]), randint(X[2, 0], X[2, 1]))
         timeBeforeChange = t
 
     change_xgoal = (xgoal != T.xgoal)
