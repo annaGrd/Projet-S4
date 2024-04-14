@@ -1,9 +1,10 @@
 import numpy as np
+from Part1.Grille.import_obstacles import get_obstacles
 
 # Généralités
-X = np.array([[0, 30], [0, 30], [0, 30]])  # taille de grille
+X = np.array([[-90, 200], [-90, 200], [-90, 200]])  # taille de grille
 
-Xobs = np.array([[[0, 25], [8, 10], [0, 25]], [[5, 30], [18, 20], [5, 30]]])  # liste des obstacles
+Xobs = get_obstacles("Position_obstacle_a_jour.txt")  # liste des obstacles
 vObs = 0  # Volume occupé par les obstacles
 k = 100 # nombre de points max dans la trajectoire
 
