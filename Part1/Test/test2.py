@@ -8,7 +8,7 @@ from Part1.MainAndClasses.noeud import Noeud
 fig = plt.figure()
 ax = fig.add_subplot(projection="3d")
 
-xa = Noeud(3, 3, 3)
+xa = Noeud(15, 15, 15)
 
 listDronePositions, listTraj, listXgoal, listDynamicObstacles, listNodes, listLinks = main(xa, [])
 

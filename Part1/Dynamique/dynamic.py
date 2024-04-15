@@ -97,9 +97,9 @@ global timeBeforeChange
 timeBeforeChange = 0
 
 global xgoal
-xgoal = Noeud(randint(X[0, 0], X[0, 1]), randint(X[1, 0], X[1, 1]), randint(X[2, 0], X[2, 1]))
+xgoal = Noeud(randint(10, 20), randint(10, 20), randint(0, 5))
 while not inGrid(xgoal):
-    xgoal = Noeud(randint(X[0, 0], X[0, 1]), randint(X[1, 0], X[1, 1]), randint(X[2, 0], X[2, 1]))
+    xgoal = Noeud(randint(10, 20), randint(10, 20), randint(0, 5))
 
 
 def update_goal_and_obstacles(T, t):
@@ -113,9 +113,9 @@ def update_goal_and_obstacles(T, t):
     global xgoal
 
     if t - timeBeforeChange > 10:
-        xgoal = Noeud(randint(X[0, 0], X[0, 1]), randint(X[1, 0], X[1, 1]), randint(X[2, 0], X[2, 1]))
+        xgoal = Noeud(randint(10, 20), randint(10, 20), randint(0, 5))
         while not inGrid(xgoal):
-            xgoal = Noeud(randint(X[0, 0], X[0, 1]), randint(X[1, 0], X[1, 1]), randint(X[2, 0], X[2, 1]))
+            xgoal = Noeud(randint(10, 20), randint(10, 20), randint(0, 5))
         timeBeforeChange = t
 
     change_xgoal = (xgoal != T.xgoal)

@@ -8,13 +8,13 @@ function [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed)
         
     acceleration_duration = 2;
     points = path;
-    points(:, 1) = xa;
+    points(:, 1) = [xa(1:3);0];
 
     if length(points(1, :)) == 1 % Si le drone ne bouge pas
+        xorigin = points(:, 1);
         points = [[0;0;0;0], [0;0;0;0]];
         timeValues = [0, 10];
         traj = timeseries(points, timeValues);
-        xorigin = points(:, 1);
         tStart = 0;
     else
 

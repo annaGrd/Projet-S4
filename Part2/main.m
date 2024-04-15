@@ -1,6 +1,6 @@
 warning("off", "all")
 
-xa = [3;3;3;0];
+xa = [15;15;15;0];
 speed = [0;0;0;0];
 pathBefore = [0;0;0;0];
 path = [0;0;0;0];
@@ -60,7 +60,7 @@ while time() - tGlobal < 300
     %- Si le chemin a changé
     %- Si on arrive à la fin de la trajectoire prédite
     %De plus si on atteint l'objectif, on ne refait jamais la simu
-    if ((~isequal(path, pathBefore)) | (time() - tLastSim > tsOut.Time(length(tsOut.Time)))) & ( distanceToEndPath > .5)
+    if ((~isequal(path, pathBefore)) | (time() - tLastSim > tsOut.Time(length(tsOut.Time)))) & ( distanceToEndPath > .01)
         disp("Simulation begining")
 
         % Le régulateur conserve des résultats cohérents autour de son
@@ -70,8 +70,8 @@ while time() - tGlobal < 300
         [traj, xorigin, tStart] = pathToTraj(xa, path, v, w, speed);
         
         % On simule sur un petit temps pour que ce soit rapide
-        simTime = min(5, traj.Time(length(traj.Time)));
-
+        simTime = 5;
+        
         tsOut = sim("PIDF_avec_xy_pour_algo.slx", "StopTime", num2str(simTime)).tsOut;
         tLastSim = t - tStart;
         
